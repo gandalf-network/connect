@@ -16,5 +16,6 @@
     "allowJs": true,
     "emitDeclarationOnly": false
   },
-  "exclude": ["**/*.spec.ts", "**/*.test.ts", "tests", "examples"]
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "tests", "examples"],
+  "include": ["src"]
 }

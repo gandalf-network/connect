@@ -5,11 +5,11 @@ const redirectURL = "https://medium.com/bynder-tech/creating-a-sdk-from-scratch-
 const services = {"netflix": true, "amazon": true}
 
 async function example() {
-    const connect = await Connect.create(publicKey, redirectURL, services)
+    const connect = new Connect(publicKey, redirectURL, services)
 
-    const url = connect.generateURL()
+    const url = await connect.generateURL()
 
-    const qrCode = connect.outputQRCode()
+    const qrCode = await connect.outputQRCode()
 }
 
 example()

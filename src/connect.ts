@@ -15,38 +15,43 @@ class Connect {
 	publicKey: string;
 	redirectURL: string;
 	services: Services;
+	verifiedPublicKey: boolean = false;
 
 	constructor(publicKey: string, redirectURL: string, services: Services) {
+		Connect.validateRedirectURL(redirectURL);
+		Connect.validateInputServices(services);
+
 		this.publicKey = publicKey;
 		this.redirectURL = redirectURL;
 		this.services = services;
 	}
 
-	generateURL() {
-		const v = JSON.stringify(this.services)
-	
-		return `${APP_CLIP_BASE_URL}?services=${v}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
+	async generateURL() {
+		await Connect.validatePublicKey(this.publicKey);
+		const services = JSON.stringify(this.services)
+		return `${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
 	}
 
-	outputQRCode() {
-		const v = JSON.stringify(this.services)
-		const url = `${APP_CLIP_BASE_URL}?services=${v}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
+	async outputQRCode() {
+		await Connect.validatePublicKey(this.publicKey);
+		const services = JSON.stringify(this.services)
+		const url = `${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
 		const qrCode = new QRCodeStyling(qrCodeStyle(url));
 
 		return qrCode
 	}
 
-	static async create(publicKey: string, redirectURL: string, services: Services): Promise<Connect> {
-        await Connect.validatePublicKey(publicKey);
-        Connect.validateRedirectURL(redirectURL);
-		Connect.validateInputServices(services);
-        return new Connect(publicKey, redirectURL, services);
-    }
+	// static async create(publicKey: string, redirectURL: string, services: Services): Promise<Connect> {
+    //     await Connect.validatePublicKey(publicKey);
+    //     Connect.validateRedirectURL(redirectURL);
+	// 	Connect.validateInputServices(services);
+    //     return new Connect(publicKey, redirectURL, services);
+    // }
 
 	private static async validatePublicKey(publicKey: string): Promise<void> {
 		const publicKeyExists = await verifyPublicKey(publicKey);
 		if (!publicKeyExists) {
-				throw new Error('Public key does not exist');
+			throw new Error('Public key does not exist');
 		}
 	}
 
