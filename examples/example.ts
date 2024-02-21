@@ -7,9 +7,13 @@ const services = {"netflix": true, "amazon": true}
 async function example() {
     const connect = new Connect(publicKey, redirectURL, services)
 
+    // Generate the AppClip URL
     const url = await connect.generateURL()
 
-    const qrCode = await connect.outputQRCode()
+    // Generate a QRCode linking t
+    const qrCode = await connect.generateQRCode()
+
+
 }
 
 example()
