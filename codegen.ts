@@ -4,7 +4,7 @@ import { WATSON_URL } from './src/lib/constants';
 const config: CodegenConfig = {
     schema: [
         {
-            ["https://watson-v2-staging.onrender.com/gql"]: {},
+            [WATSON_URL]: {},
         },
     ],
     documents: ['./src/api/gql/*.ts'],
