@@ -7,12 +7,10 @@ jest.mock('../api/publicKey', () => ({
   verifyPublicKey: jest.fn()
 }));
 
-jest.setTimeout(10000)
-
 describe('Connect SDK', () => {
   const publicKey = 'examplePublicKey';
   const redirectURL = 'https://example.com';
-  const services = {"amazon": true, "netflix": false}
+  const services = {"NETFLIX": true}
   const stringServices = JSON.stringify(services)
 
   beforeEach(() => {
@@ -26,10 +24,18 @@ describe('Connect SDK', () => {
       expect(connect.publicKey).toEqual(publicKey);
       expect(connect.redirectURL).toEqual(redirectURL);
     });
+
+    it('should strip the redirect url of trailing slashes', async () => {
+      const redirectURL = 'https://example.com/';
+      const connect = new Connect(publicKey, redirectURL, services);
+
+      expect(connect.redirectURL).toEqual('https://example.com')
+    });
   });
 
   describe('allValidations', () => {
     it('should pass all validations and call verifyPublicKey only once', async () => {
+
       const connect = new Connect(publicKey, redirectURL, services);
       await connect.generateURL();
       await connect.generateQRCode();
@@ -66,7 +72,7 @@ describe('Connect SDK', () => {
     });
 
     it('should throw error if no required service is passed', async () => {
-      const invalidServices = {"amazon": false, "netflix": false}
+      const invalidServices = {"NETFLIX": false}
       const connect = new Connect(publicKey, redirectURL, invalidServices);
 
       await expect(connect.generateURL()).rejects.toThrow('At least one service has to be required');
@@ -78,7 +84,7 @@ describe('Connect SDK', () => {
     it('should generate the correct URL', async () => {
       const connect = new Connect(publicKey, redirectURL, services);
       const generatedURL = await connect.generateURL();
-      expect(generatedURL).toEqual(`${APP_CLIP_BASE_URL}?services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`);
+      expect(generatedURL).toEqual(encodeURI(`${APP_CLIP_BASE_URL}?services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`));
     });
   });
 
@@ -86,7 +92,7 @@ describe('Connect SDK', () => {
     it('should create QR code with correct options', async () => {
       const connect = new Connect(publicKey, redirectURL, services);
       const qrCode = await connect.generateQRCode();
-      expect(qrCode._options.data).toEqual(`${APP_CLIP_BASE_URL}?services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`)
+      expect(qrCode._options.data).toEqual(encodeURI(`${APP_CLIP_BASE_URL}?services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`))
     });
   });
 

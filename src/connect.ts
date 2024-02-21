@@ -3,13 +3,9 @@ import QRCodeStyling from "qr-code-styling";
 import { verifyPublicKey } from './api/publicKey';
 import { APP_CLIP_BASE_URL } from "./lib/constants";
 import { qrCodeStyle } from "./lib/qrCode-style";
+import { Source } from './api/__generated__/graphql';
 
-export enum SupportedServices {
-    Netflix = "netflix",
-    Amazon  = "amazon",
-}
-
-export type Services = Partial<Record<SupportedServices, boolean>>;
+export type Services = Partial<Record<Source, boolean>>;
 
 class Connect {
 	publicKey: string;
@@ -18,6 +14,10 @@ class Connect {
 	verificationComplete: boolean = false;
 
 	constructor(publicKey: string, redirectURL: string, services: Services) {
+    if (redirectURL.endsWith('/')) {
+      redirectURL = redirectURL.slice(0, -1)
+    }
+
 		this.publicKey = publicKey;
 		this.redirectURL = redirectURL;
 		this.services = services;
@@ -26,13 +26,13 @@ class Connect {
 	async generateURL() {
 		await this.allValidations(this.publicKey, this.redirectURL, this.services);
 		const services = JSON.stringify(this.services)
-		return `${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
+    return encodeURI(`${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
 	}
 
 	async generateQRCode() {
 		await this.allValidations(this.publicKey, this.redirectURL, this.services);
 		const services = JSON.stringify(this.services)
-		const url = `${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`
+		const url = encodeURI(`${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
 		const qrCode = new QRCodeStyling(qrCodeStyle(url));
 
 		return qrCode
@@ -66,16 +66,16 @@ class Connect {
 	}
 
 	private static validateInputServices(input: Services): void {
-		const validKeys = Object.values(SupportedServices);
+		const validKeys = Object.values(Source);
 		type stringArray = string[];
 		let unsupportedServices:stringArray = []
     let requiredServices = 0
 		for (const key in input) {
-			if (!validKeys.includes(key as SupportedServices)) {
+			if (!validKeys.includes(key as Source)) {
 				unsupportedServices = [...unsupportedServices, key]
         continue
 			}
-      if (input[key as SupportedServices]) requiredServices++
+      if (input[key as Source]) requiredServices++
 		}
 
 		if (unsupportedServices.length > 0) {
