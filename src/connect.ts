@@ -5,7 +5,7 @@ import { APP_CLIP_BASE_URL } from "./lib/constants";
 import { qrCodeStyle } from "./lib/qrCode-style";
 import { Source } from './api/__generated__/graphql';
 import { getSupportedServices } from './api/supportedServices';
-import { ConnectError, ErrorCodes } from './lib/errors';
+import { ConnectError, ErrorCode } from './lib/errors';
 
 export type Services = {
     [key: string]: boolean;
@@ -52,7 +52,7 @@ class Connect {
 		const dataKey = url.searchParams.get('dataKey');
 
 		if (!dataKey) {
-			throw new ConnectError(`Datakey not found in the URL ${inputURL}`, ErrorCodes.DataKeyNotFound)
+			throw new ConnectError(`Datakey not found in the URL ${inputURL}`, ErrorCode.DataKeyNotFound)
 		}
 		return dataKey
 	}
@@ -70,7 +70,7 @@ class Connect {
 	private static async validatePublicKey(publicKey: string): Promise<void> {
 		const isValidPublicKey = await verifyPublicKey(publicKey);
 		if (!isValidPublicKey) {
-			throw new ConnectError('Public key does not exist', ErrorCodes.InvalidPublicKey);
+			throw new ConnectError('Public key does not exist', ErrorCode.InvalidPublicKey);
 		}
 	}
 
@@ -89,12 +89,12 @@ class Connect {
 		if (unsupportedServices.length > 0) {
 			throw new ConnectError(
 				`These services ${unsupportedServices.join(' ')} are unsupported`,
-				ErrorCodes.InvalidService
+				ErrorCode.InvalidService
 			)
 		}
 
 		if (requiredServices < 1) {
-			throw new ConnectError("At least one service has to be required", ErrorCodes.InvalidService)
+			throw new ConnectError("At least one service has to be required", ErrorCode.InvalidService)
 		}
 	}
 	
@@ -102,7 +102,7 @@ class Connect {
 		try {
 			Boolean(new URL(url));
 		} catch (e) {
-			throw new ConnectError('Invalid redirectURL', ErrorCodes.InvalidRedirectURL);
+			throw new ConnectError('Invalid redirectURL', ErrorCode.InvalidRedirectURL);
 		}
 	}
 }

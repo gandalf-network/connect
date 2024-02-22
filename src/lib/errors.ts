@@ -1,4 +1,4 @@
-enum ErrorCodes {
+enum ErrorCode {
   InvalidPublicKey   = 'INVALID_PUBLIC_KEY',
   InvalidRedirectURL = 'INVALID_REDIRECT_URL',
   InvalidService     = 'INVALID_SERVICE',
@@ -6,8 +6,8 @@ enum ErrorCodes {
 }
   
 class ConnectError extends Error {
-  code: ErrorCodes
-  constructor(message: string, code: ErrorCodes) {
+  code: ErrorCode
+  constructor(message: string, code: ErrorCode) {
     super(message);
 
     Object.setPrototypeOf(this, ConnectError.prototype);
@@ -16,4 +16,4 @@ class ConnectError extends Error {
   }
 }
   
-export { ConnectError, ErrorCodes };
+export { ConnectError, ErrorCode };
