@@ -8,3 +8,14 @@ export const GET_APP_BY_PUBLIC_KEY = gql(`
     }
   }
 `);
+
+export const GET_SUPORTED_SERVICES = gql(`
+  query GetSupportedServices {
+    __type(name: "Source") {
+      name
+      enumValues(includeDeprecated: false) {
+        name
+      }
+    }
+  }
+`);

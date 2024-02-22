@@ -1,4 +1,5 @@
 import { verifyPublicKey } from "../api/publicKey";
+import { getSupportedServices } from "../api/supportedServices";
 import { Services } from "../connect";
 import Connect from "../index";
 import { APP_CLIP_BASE_URL } from "../lib/constants";
@@ -7,15 +8,24 @@ jest.mock('../api/publicKey', () => ({
   verifyPublicKey: jest.fn()
 }));
 
+jest.mock('../api/supportedServices', () => ({
+  getSupportedServices: jest.fn()
+}));
+
 describe('Connect SDK', () => {
   const publicKey = 'examplePublicKey';
   const redirectURL = 'https://example.com';
   const services = {"NETFLIX": true}
   const stringServices = JSON.stringify(services)
-
+  
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
+    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix"]);
   })
+
+  afterEach(() => {
+    (getSupportedServices as jest.Mock).mockClear();
+  });
 
   describe('Constructor', () => {  
     it('should initialize publicKey and redirectURL properly', async () => {
@@ -106,6 +116,13 @@ describe('Connect SDK', () => {
     it('should throw data key not found error', () => {
       const url = 'https://dashboard.doppler.com/connect=success?noDataKey=11221122'
       expect(() => Connect.getDataKeyFromURL(url)).toThrow(`Datakey not found in the URL ${url}`);
+    });
+  });
+
+  describe('getSupportedServices', () => {
+    it('should get the supported services', async () => {
+      await Connect.getSupportedServices();
+      expect(getSupportedServices as jest.Mock).toHaveBeenCalledTimes(1)
     });
   });
 });

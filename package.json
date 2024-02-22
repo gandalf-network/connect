@@ -10,8 +10,7 @@
   "scripts": {
     "test": "npx jest",
     "build": "webpack",
-    "generate-gql": "graphql-codegen codegen.ts --debug --verbose",
-    "postinstall": "npm run generate-gql"
+    "generate-gql": "graphql-codegen codegen.ts --debug --verbose"
   },
   "keywords": [],
   "author": "",
