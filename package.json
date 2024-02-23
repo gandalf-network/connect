@@ -1,5 +1,5 @@
 {
-  "name": "client-side-sdk",
+  "name": "@gandalf-network/connect",
   "version": "1.0.0",
   "description": "",
   "main": "dist/bundle.js",
