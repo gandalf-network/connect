@@ -6,7 +6,7 @@ export const qrCodeStyle = (url: string): Partial<Options> => {
       {
         width: 300,
         height: 300,
-        data: "https://qr-code-styling.com",
+        data: url,
         margin: 0,
         qrOptions: {
           typeNumber: 0,

@@ -1,6 +1,6 @@
 import Connect, { Services } from "./connect";
-import { ConnectError, ErrorCode } from "./lib/errors";
+import { GandalfError, GandalfErrorCode } from "./lib/errors";
 
 
-export { Services, ConnectError, ErrorCode }
+export { Services, GandalfError, GandalfErrorCode }
 export default Connect;
