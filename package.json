@@ -13,13 +13,16 @@
     "generate-gql": "graphql-codegen codegen.ts --debug --verbose"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "gandalf-network",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gandalf-network/connect.git"
+  },
   "dependencies": {
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
-    "qr-code-styling": "^1.6.0-rc.1",
-    "ts-node": "^10.9.2"
+    "qr-code-styling": "^1.6.0-rc.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
@@ -29,6 +32,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4"

@@ -5,15 +5,19 @@ const redirectURL = "https://medium.com"
 const services = {"NETFLIX": true}
 
 async function example() {
-    const connect = new Connect(publicKey, redirectURL, services)
+    const connect = new Connect({publicKey, redirectURL, services})
 
-    // Generate the AppClip URL
+    // Generate the Connect URL
     const url = await connect.generateURL()
+    console.log(url)
 
-    // Generate a QRCode linking t
-    const qrCode = await connect.generateQRCode()
+    // Generate a QRCode linking to the Connect
+    const qrCodeURL = await connect.generateQRCode()
+    console.log(qrCodeURL)
 
-
+    // Extract the datakey from the redirectURL
+    const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
+    console.log(datakey)
 }
 
 example()

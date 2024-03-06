@@ -63,12 +63,13 @@ class Connect {
 		return services;
 	}
 
-	static getDataKeyFromURL(inputURL: string): string {
-		const url = new URL(inputURL);
+	static getDataKeyFromURL(redirectURL: string): string {
+		Connect.validateRedirectURL(redirectURL);
+		const url = new URL(redirectURL);
 		const dataKey = url.searchParams.get('dataKey');
 
 		if (!dataKey) {
-			throw new GandalfError(`Datakey not found in the URL ${inputURL}`, GandalfErrorCode.DataKeyNotFound)
+			throw new GandalfError(`Datakey not found in the URL ${redirectURL}`, GandalfErrorCode.DataKeyNotFound)
 		}
 		return dataKey
 	}
