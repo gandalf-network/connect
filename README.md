@@ -1,6 +1,6 @@
 # connect
 
-connect is a library that makes it easier to generate valid Connect URLs that allows your users to link their accounts to Gandalf.
+`connect` is a library that makes it easier to generate valid [Connect](https://docs.gandalf.network/concepts/connect) URLs that lets your users to link their accounts to Gandalf.
 
 ## Features
 
@@ -14,7 +14,7 @@ This section provides a quick overview of how to integrate the library into your
 
 ### Prerequisites
 
-NodeJs
+[NodeJS](https://nodejs.org/) - version 16.X or higher
 
 ### Installation
 
@@ -24,7 +24,7 @@ npm install @gandalf-network/connect --save
 
 ### Usage
 
-### Initialization
+#### Initialization
 
 ```typescript
 import Connect from "@gandalf-network/connect";
@@ -36,21 +36,23 @@ const connect = new Connect({
 })
 ```
 
-### Generate a Connect URL
+#### Generate a Connect URL
 
 ```typescript
 const url = await connect.generateURL()
 console.log(url)
 ```
 
-### Generate a Connect QRCode
+#### Generate a Connect QRCode
+
+Note: This function is intended for web applications only and will not work other platforms.
 
 ```typescript
 const qrCodeURL = await connect.generateQRCode()
 console.log(qrCodeURL)
 ```
 
-### Extract the dataKey from the redirectURL
+#### Extract the dataKey from the redirectURL
 
 ```typescript
 const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
