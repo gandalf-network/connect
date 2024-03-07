@@ -14,7 +14,7 @@ This section provides a quick overview of how to integrate the library into your
 
 ### Prerequisites
 
-[NodeJS](https://nodejs.org/) - version 16.X or higher
+[NodeJS](https://nodejs.org/) - version 16.x or higher
 
 ### Installation
 
