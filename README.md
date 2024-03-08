@@ -45,7 +45,7 @@ console.log(url)
 
 #### Generate a Connect QRCode
 
-Note: This function is intended for web applications only and will not work other platforms.
+Note: This function will only work within a browser context and will fail otherwise.
 
 ```typescript
 const qrCodeURL = await connect.generateQRCode()
