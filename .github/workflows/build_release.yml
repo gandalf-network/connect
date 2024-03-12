@@ -29,6 +29,6 @@ jobs:
         env:
           WATSON_URL: ${{ secrets.WATSON_URL }}
           APP_CLIP_BASE_URL: ${{ secrets.APP_CLIP_BASE_URL }}
-      - run: npm publish
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
