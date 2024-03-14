@@ -1,6 +1,6 @@
 {
   "name": "@gandalf-network/connect",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gandalf-network/connect.git"
+    "url": "git+https://github.com/gandalf-network/connect.git"
   },
   "dependencies": {
     "graphql": "^16.8.1",
