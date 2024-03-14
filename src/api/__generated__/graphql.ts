@@ -14,6 +14,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  Date: { input: any; output: any; }
   /** Scalar type representing a 64-bit signed integer. */
   Int64: { input: any; output: any; }
   JSON: { input: any; output: any; }
@@ -32,15 +33,10 @@ export type Activity = {
   metadata: ActivityMetadata;
 };
 
-/** Represents an activity with source and data. */
-export type ActivityInput = {
-  /** The data associated with the activity. */
-  data: Scalars['String']['input'];
-  /** The source of the activity. */
-  source: Source;
+export type ActivityMetadata = {
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
 };
-
-export type ActivityMetadata = NetflixActivityMetadata;
 
 export type ActivityResponse = {
   __typename?: 'ActivityResponse';
@@ -53,31 +49,28 @@ export type ActivityResponse = {
   total: Scalars['Int64']['output'];
 };
 
-/** Type representing a registered application. */
+/**
+ * Represents a registered application within the system, encapsulating all relevant details
+ * that identify and describe the application.
+ */
 export type Application = {
   __typename?: 'Application';
+  /** The human-readable name of the application. */
   appName: Scalars['String']['output'];
+  /** The address of the user who registered the application.  */
   appRegistrar: Scalars['String']['output'];
+  /** A unique identifier assigned to the application upon registration. */
   gandalfID: Scalars['Int64']['output'];
+  /**
+   * The URL pointing to the icon graphic for the application. This URL should link to an image
+   * that visually represents the application, aiding in its identification and branding.
+   */
   iconURL: Scalars['String']['output'];
+  /**
+   * A public key associated with the application, used for cryptographic operations such as
+   * verifying the identity of the application.
+   */
   publicKey: Scalars['String']['output'];
-};
-
-/** Contains information related to the attestation process during user registration. */
-export type Attestation = {
-  /** Attestation object received during registration. */
-  attestationObject: Scalars['String']['input'];
-  /** JSON representation of client data. */
-  clientDataJson: Scalars['String']['input'];
-  credentialId: Scalars['String']['input'];
-};
-
-/** Represents a request for user authentication in the authentication system. */
-export type AuthenticationRequest = {
-  /** passkey user credential id for user. */
-  credentialId: Scalars['String']['input'];
-  /** Information related to the signed key during user authentication. */
-  signedKey: SignedKey;
 };
 
 export type Identifier = {
@@ -89,88 +82,49 @@ export type Identifier = {
 };
 
 export enum IdentifierType {
-  Imdb = 'IMDB'
+  Imdb = 'IMDB',
+  Tvdb = 'TVDB',
+  Tvmaze = 'TVMAZE'
 }
 
-/** Represents a JSON Web Token. */
-export type Jwt = {
-  __typename?: 'JWT';
-  /** The token string. */
-  token: Scalars['String']['output'];
-};
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  /** User authentication mutation. */
-  authenticate: Jwt;
-  /** Publishes an activity for a user profile. */
-  publishActivity: PublishActivityResponse;
-  /** User registration mutation. */
-  register: Jwt;
-};
-
-
-export type MutationAuthenticateArgs = {
-  authenticationRequest: AuthenticationRequest;
-};
-
-
-export type MutationPublishActivityArgs = {
-  activity: ActivityInput;
-};
-
-
-export type MutationRegisterArgs = {
-  registrationRequest: RegistrationRequest;
-};
-
-export type NetflixActivityMetadata = {
+export type NetflixActivityMetadata = ActivityMetadata & {
   __typename?: 'NetflixActivityMetadata';
+  /** Date indicating when the activity occurred , formatted as (DD/MM/YYYY). */
+  date?: Maybe<Scalars['Date']['output']>;
   /** List of identifiers associated with the activity's subject. */
   subject?: Maybe<Array<Maybe<Identifier>>>;
-  /** Timestamp indicating when the activity occurred. */
-  timestamp?: Maybe<Scalars['Time']['output']>;
   /** The title of the Netflix activity */
   title: Scalars['String']['output'];
 };
 
-/** Represents a request for user registration with additional parameters. */
-export type PasskeyRegisterRequest = {
-  __typename?: 'PasskeyRegisterRequest';
-  /** Relying party information. */
-  rp: Rp;
-  /** User information. */
-  user: PasskeyUser;
-};
-
-/** Represents a user in the authentication system. */
-export type PasskeyUser = {
-  __typename?: 'PasskeyUser';
-  /** The display name of the user. */
-  displayName: Scalars['String']['output'];
-  /** Unique identifier for the user. */
-  id: Scalars['String']['output'];
-  /** The name of the user. */
-  name: Scalars['String']['output'];
-};
-
-export type PublishActivityResponse = {
-  __typename?: 'PublishActivityResponse';
-  dataKey: Scalars['String']['output'];
-};
-
 export type Query = {
   __typename?: 'Query';
-  /** Retrieves the details of the currently logged-in user. */
-  currentUser?: Maybe<User>;
-  /** Generates passkey registration request. */
-  generatePasskeyRegisterRequest?: Maybe<PasskeyRegisterRequest>;
+  /**
+   * Retrieves a paginated list of activities based on a given data key and source.
+   *
+   * Returns: A response object containing a list of activities, along with pagination information.
+   */
+  getActivity: ActivityResponse;
+  /**
+   * Retrieves an application by its public key.
+   *
+   * Returns: An Application object that includes detailed information about the requested application.
+   */
   getAppByPublicKey: Application;
+  /**
+   * Looks up a specific activity by its unique identifier (ID) and a data key.
+   *
+   * Returns: An Activity object containing detailed information about the requested activity.
+   */
+  lookupActivity: Activity;
 };
 
 
-export type QueryGeneratePasskeyRegisterRequestArgs = {
-  displayName: Scalars['String']['input'];
+export type QueryGetActivityArgs = {
+  dataKey: Scalars['String']['input'];
+  limit: Scalars['Int64']['input'];
+  page: Scalars['Int64']['input'];
+  source: Source;
 };
 
 
@@ -178,47 +132,15 @@ export type QueryGetAppByPublicKeyArgs = {
   publicKey: Scalars['String']['input'];
 };
 
-/** Represents a request for user registration in the authentication system. */
-export type RegistrationRequest = {
-  /** Information related to the attestation process during user registration. */
-  attestation: Attestation;
-  /** A challenge string for additional security. */
-  challenge: Scalars['String']['input'];
-  /** The display name of the user. */
-  displayName: Scalars['String']['input'];
-  /** The name of the user. */
-  name: Scalars['String']['input'];
-};
 
-/** Represents a relying party in the authentication system. */
-export type Rp = {
-  __typename?: 'Rp';
-  /** Unique identifier for the relying party. */
-  id: Scalars['String']['output'];
-  /** The name of the relying party. */
-  name: Scalars['String']['output'];
-};
-
-/** Contains information related to the signed key during user authentication. */
-export type SignedKey = {
-  stampHeaderName: Scalars['String']['input'];
-  stampHeaderValue: Scalars['String']['input'];
+export type QueryLookupActivityArgs = {
+  activityId: Scalars['UUID']['input'];
+  dataKey: Scalars['String']['input'];
 };
 
 export enum Source {
   Netflix = 'NETFLIX'
 }
-
-/** Represents a user entity. */
-export type User = {
-  __typename?: 'User';
-  /** The unique identifier for the user. */
-  id: Scalars['UUID']['output'];
-  /** The identifier for the sub-organization associated with the user. */
-  subOrganizationId: Scalars['String']['output'];
-  /** The username of the user. */
-  username: Scalars['String']['output'];
-};
 
 /**
  * The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.
