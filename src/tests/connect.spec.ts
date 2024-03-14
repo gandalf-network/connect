@@ -3,6 +3,7 @@ import { getSupportedServices } from "../api/supportedServices";
 import { Services } from "../connect";
 import Connect from "../index";
 import { APP_CLIP_BASE_URL } from "../lib/constants";
+import QRCodeStyling from "qr-code-styling";
 
 jest.mock('../api/publicKey', () => ({
   verifyPublicKey: jest.fn()
@@ -11,6 +12,14 @@ jest.mock('../api/publicKey', () => ({
 jest.mock('../api/supportedServices', () => ({
   getSupportedServices: jest.fn()
 }));
+
+jest.mock('qr-code-styling', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getRawData: jest.fn().mockReturnValue(new Blob()),
+    };
+  });
+});
 
 describe('Connect SDK', () => {
   const publicKey = 'examplePublicKey';
@@ -21,6 +30,7 @@ describe('Connect SDK', () => {
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
     (getSupportedServices as jest.Mock).mockResolvedValue(["netflix"]);
+    global.URL.createObjectURL = jest.fn(() => "mocked-object-url");
   })
 
   afterEach(() => {
@@ -97,13 +107,13 @@ describe('Connect SDK', () => {
     });
   });
 
-  // describe('generateQRCode', () => {
-  //   it('should create QR code with correct options', async () => {
-  //     const connect = new Connect({publicKey, redirectURL, services});
-  //     const qrCodeUrl = await connect.generateQRCode();
-  //     expect(qrCodeUrl).toBeTruthy()
-  //   });
-  // });
+  describe('generateQRCode', () => {
+    it('should create QR code with correct options', async () => {
+      const connect = new Connect({publicKey, redirectURL, services});
+      const qrCodeUrl = await connect.generateQRCode();
+      expect(qrCodeUrl).toBeTruthy()
+    });
+  });
 
   describe('getDataKeyFromURL', () => {
     it('should get the data key from the url', () => {
