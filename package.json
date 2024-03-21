@@ -1,19 +1,21 @@
 {
   "name": "@gandalf-network/connect",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
-  "main": "dist/entry.bundle.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "jsnext:main": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "module": "dist/entry.bundle.js",
+  "typings": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/entry.bundle.js",
-      "require": "./dist/entry.bundle.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./components": {
-      "import": "./dist/components.bundle.js",
-      "require": "./dist/components.bundle.js",
+      "import": "./dist/components.mjs",
+      "require": "./dist/components.js",
       "types": "./dist/components.d.ts"
     }
   },
@@ -22,7 +24,8 @@
   ],
   "scripts": {
     "test": "npx jest",
-    "build": "webpack",
+    "build": "npm run clean && npx rollup -c --bundleConfigAsCjs",
+    "clean": "rimraf dist",
     "generate-gql": "graphql-codegen codegen.ts --debug --verbose"
   },
   "keywords": [],
@@ -38,16 +41,22 @@
     "qr-code-styling": "^1.6.0-rc.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.3",
+    "@babel/preset-env": "^7.24.3",
     "@graphql-codegen/cli": "^5.0.2",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@types/babel__core": "^7.20.5",
     "@types/jest": "^29.5.12",
     "dotenv": "^16.4.5",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "ts-jest": "^29.1.2",
-    "ts-loader": "^9.5.1",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.13.0",
+    "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4"
+    "typescript": "^5.3.3"
   }
 }

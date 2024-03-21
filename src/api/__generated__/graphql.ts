@@ -49,6 +49,20 @@ export type ActivityResponse = {
   total: Scalars['Int64']['output'];
 };
 
+export type AmazonActivityMetadata = ActivityMetadata & {
+  __typename?: 'AmazonActivityMetadata';
+  /** Date indicating when the activity occurred. */
+  date?: Maybe<Scalars['Date']['output']>;
+  /** The product name of the Amazon activity */
+  productName: Scalars['String']['output'];
+  /** Quantity of item purchased */
+  quantityPurchased: Scalars['Int']['output'];
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+  /** Total cost of purchased product */
+  totalCost: Scalars['String']['output'];
+};
+
 /**
  * Represents a registered application within the system, encapsulating all relevant details
  * that identify and describe the application.
@@ -73,18 +87,30 @@ export type Application = {
   publicKey: Scalars['String']['output'];
 };
 
+export enum ContentType {
+  Music = 'MUSIC',
+  Shorts = 'SHORTS',
+  Video = 'VIDEO'
+}
+
 export type Identifier = {
   __typename?: 'Identifier';
   /** The type of the identifier (enumeration) */
-  type: IdentifierType;
+  identifierType: IdentifierType;
   /** The string value of the identifier. */
   value: Scalars['String']['output'];
 };
 
 export enum IdentifierType {
+  Asin = 'ASIN',
+  Igdb = 'IGDB',
   Imdb = 'IMDB',
+  Moby = 'MOBY',
+  Playstation = 'PLAYSTATION',
+  Rawg = 'RAWG',
   Tvdb = 'TVDB',
-  Tvmaze = 'TVMAZE'
+  Tvmaze = 'TVMAZE',
+  Youtube = 'YOUTUBE'
 }
 
 export type NetflixActivityMetadata = ActivityMetadata & {
@@ -94,6 +120,16 @@ export type NetflixActivityMetadata = ActivityMetadata & {
   /** List of identifiers associated with the activity's subject. */
   subject?: Maybe<Array<Maybe<Identifier>>>;
   /** The title of the Netflix activity */
+  title: Scalars['String']['output'];
+};
+
+export type PlaystationActivityMetadata = ActivityMetadata & {
+  __typename?: 'PlaystationActivityMetadata';
+  /** Date indicating the last time game was played. */
+  lastPlayedAt?: Maybe<Scalars['Date']['output']>;
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+  /** The title of the Playstation activity */
   title: Scalars['String']['output'];
 };
 
@@ -139,8 +175,25 @@ export type QueryLookupActivityArgs = {
 };
 
 export enum Source {
-  Netflix = 'NETFLIX'
+  Amazon = 'AMAZON',
+  Netflix = 'NETFLIX',
+  Playstation = 'PLAYSTATION',
+  Youtube = 'YOUTUBE'
 }
+
+export type YoutubeActivityMetadata = ActivityMetadata & {
+  __typename?: 'YoutubeActivityMetadata';
+  /** Enum denoting the type of the youtube activity */
+  contentType: ContentType;
+  /** Date indicating the last time the Youtube video was played. */
+  date?: Maybe<Scalars['Date']['output']>;
+  /** An integer indicating what percentage of the entire video duration watched. */
+  percentageWatched: Scalars['Int']['output'];
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+  /** The title of the Youtube activity */
+  title: Scalars['String']['output'];
+};
 
 /**
  * The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.
