@@ -35,7 +35,7 @@ class Connect {
 	async generateURL(): Promise<string> {
 		await this.allValidations(this.publicKey, this.redirectURL, this.services);
 		const services = JSON.stringify(this.services)
-    	return encodeURI(`${APP_CLIP_BASE_URL}?services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
+    	return encodeURI(`${APP_CLIP_BASE_URL}&services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
 	}
 
 	async generateQRCode(): Promise<string> {

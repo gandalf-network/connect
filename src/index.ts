@@ -1,6 +1,3 @@
-import Connect, { Services } from "./connect";
-import { GandalfError, GandalfErrorCode } from "./lib/errors";
+import Connect from "./connect";
 
-
-export { Services, GandalfError, GandalfErrorCode }
 export default Connect;
