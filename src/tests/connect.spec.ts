@@ -103,7 +103,7 @@ describe('Connect SDK', () => {
     it('should generate the correct URL', async () => {
       const connect = new Connect({publicKey, redirectURL, services});
       const generatedURL = await connect.generateURL();
-      expect(generatedURL).toEqual(encodeURI(`${APP_CLIP_BASE_URL}?services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`));
+      expect(generatedURL).toEqual(encodeURI(`${APP_CLIP_BASE_URL}&services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`));
     });
   });
 
