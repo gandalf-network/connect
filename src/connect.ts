@@ -1,8 +1,15 @@
-import './global';
-import QRCodeStyling from "qr-code-styling";
 import { verifyPublicKey } from './api/publicKey';
 import { APP_CLIP_BASE_URL } from "./lib/constants";
 import { qrCodeStyle } from "./lib/qrCode-style";
+
+let QRCodeStyling: any;
+
+if (typeof window !== 'undefined') {
+  import('qr-code-styling').then((module) => {
+    QRCodeStyling = module.default;
+  });
+}
+
 import { Source } from './api/__generated__/graphql';
 import { getSupportedServices } from './api/supportedServices';
 import { GandalfError, GandalfErrorCode } from './lib/errors';
