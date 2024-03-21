@@ -13,7 +13,7 @@ class GandalfError extends Error {
     super(message);
 
     Object.setPrototypeOf(this, GandalfError.prototype);
-    this.name = this.constructor.name;
+    this.name = "GandalfError";
     this.code = code;
   }
 }
