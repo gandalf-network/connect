@@ -3,7 +3,10 @@ const webpack = require('webpack');
 require('dotenv').config();
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    entry: './src/index.ts',
+    components: './src/components.ts',
+  },
   mode: 'production',
   plugins: [
     new webpack.DefinePlugin({
@@ -29,8 +32,8 @@ module.exports = {
   },
   target: 'web',
   output: {
-    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    filename: '[name].bundle.js',
     libraryTarget: 'umd',
     globalObject: 'this'
   },
