@@ -1,6 +1,6 @@
 {
   "name": "@gandalf-network/connect",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -27,6 +27,9 @@
     "build": "npm run clean && npx rollup -c --bundleConfigAsCjs",
     "clean": "rimraf dist",
     "generate-gql": "graphql-codegen codegen.ts --debug --verbose"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [],
   "author": "gandalf-network",
