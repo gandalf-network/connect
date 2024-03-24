@@ -36,6 +36,17 @@ const connect = new Connect({
 })
 ```
 
+```javascript
+// CommonJS
+const Connect = require("@gandalf-network/connect");
+
+const connect = new Connect({
+    publicKey: process.env.PUBLIC_KEY, 
+    redirectURL: "YOUR_REDIRECT_URL",
+    services: { "NETFLIX": true } // At least one service is required
+})
+```
+
 #### Generate a Connect URL
 
 ```typescript
