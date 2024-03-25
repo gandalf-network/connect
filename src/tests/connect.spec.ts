@@ -24,7 +24,7 @@ jest.mock('qr-code-styling', () => {
 describe('Connect SDK', () => {
   const publicKey = 'examplePublicKey';
   const redirectURL = 'https://example.com';
-  const services = {"NETFLIX": true}
+  const services = {"netflix": true}
   const stringServices = JSON.stringify(services)
   
   beforeEach(() => {
