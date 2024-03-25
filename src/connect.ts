@@ -42,7 +42,8 @@ class Connect {
 	async generateURL(): Promise<string> {
 		await this.allValidations(this.publicKey, this.redirectURL, this.services);
 		const services = JSON.stringify(this.services)
-    	return encodeURI(`${APP_CLIP_BASE_URL}&services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
+		const appClipURL = this.encodeComponents(services, this.redirectURL, this.publicKey);
+    	return appClipURL;
 	}
 
 	async generateQRCode(): Promise<string> {
@@ -51,8 +52,8 @@ class Connect {
 		}
 		await this.allValidations(this.publicKey, this.redirectURL, this.services);
 		const services = JSON.stringify(this.services)
-		const url = encodeURI(`${APP_CLIP_BASE_URL}&services=${services}&redirectUrl=${this.redirectURL}&publicKey=${this.publicKey}`)
-		const qrCode = new QRCodeStyling(qrCodeStyle(url));
+		const appClipURL = this.encodeComponents(services, this.redirectURL, this.publicKey);
+		const qrCode = new QRCodeStyling(qrCodeStyle(appClipURL));
 		try {
 			const qrCodeBlob = await qrCode.getRawData('webp')
 			if (!qrCodeBlob) {
@@ -79,6 +80,13 @@ class Connect {
 			throw new GandalfError(`Datakey not found in the URL ${redirectURL}`, GandalfErrorCode.DataKeyNotFound)
 		}
 		return dataKey
+	}
+
+	private encodeComponents(services: string, redirectURL: string, publicKey: string): string {
+		const encodedServices = encodeURIComponent(services)
+		const encodedRedirectURL = encodeURIComponent(redirectURL)
+		const encodedPublicKey = encodeURIComponent(publicKey)
+		return `${APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`
 	}
 
 	private async allValidations(publicKey: string, redirectURL: string, services: Services): Promise<void> {
