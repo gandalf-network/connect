@@ -92,8 +92,9 @@ class Connect {
 	private async allValidations(publicKey: string, redirectURL: string, services: Services): Promise<void> {
 		if (!this.verificationComplete) {
 			await Connect.validatePublicKey(publicKey);
-			await Connect.validateInputServices(services);
 			Connect.validateRedirectURL(redirectURL);
+			const cleanServices = await Connect.validateInputServices(services);
+			this.services = cleanServices;
 		}
 
 		this.verificationComplete = true;
@@ -106,8 +107,10 @@ class Connect {
 		}
 	}
 
-	private static async validateInputServices(input: Services): Promise<void> {
+	private static async validateInputServices(input: Services): Promise<Services> {
 		const services = await getSupportedServices();
+		const cleanServices: Services = {}
+
 		let unsupportedServices:string[] = []
 		let requiredServices = 0
 		for (const key in input) {
@@ -116,6 +119,7 @@ class Connect {
 				continue
 			}
 			if (input[key as Source]) requiredServices++
+			cleanServices[key.toLocaleLowerCase()] = input[key as Source]
 		}
 
 		if (unsupportedServices.length > 0) {
@@ -128,6 +132,7 @@ class Connect {
 		if (requiredServices < 1) {
 			throw new GandalfError("At least one service has to be required", GandalfErrorCode.InvalidService)
 		}
+		return cleanServices
 	}
 	
 	private static validateRedirectURL(url: string): void {
