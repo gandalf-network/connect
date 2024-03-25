@@ -24,7 +24,7 @@ jest.mock('qr-code-styling', () => {
 describe('Connect SDK', () => {
   const publicKey = 'examplePublicKey';
   const redirectURL = 'https://example.com';
-  const services = {"NETFLIX": true}
+  const services = {"netflix": true}
   const stringServices = JSON.stringify(services)
   
   beforeEach(() => {
@@ -102,8 +102,11 @@ describe('Connect SDK', () => {
   describe('generateURL', () => {
     it('should generate the correct URL', async () => {
       const connect = new Connect({publicKey, redirectURL, services});
+      const encodedServices = encodeURIComponent(stringServices)
+      const encodedRedirectURL = encodeURIComponent(redirectURL)
+      const encodedPublicKey = encodeURIComponent(publicKey)
       const generatedURL = await connect.generateURL();
-      expect(generatedURL).toEqual(encodeURI(`${APP_CLIP_BASE_URL}&services=${stringServices}&redirectUrl=${redirectURL}&publicKey=${publicKey}`));
+      expect(generatedURL).toEqual(`${APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`);
     });
   });
 
