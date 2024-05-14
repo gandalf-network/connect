@@ -12,26 +12,34 @@ const PLUGINS = [
   }),
   replace({
     preventAssignment: true,
-    'process.env.APP_CLIP_BASE_URL': JSON.stringify(process.env.APP_CLIP_BASE_URL),
+    'process.env.UNIVERSAL_APP_CLIP_BASE_URL': JSON.stringify(
+      process.env.UNIVERSAL_APP_CLIP_BASE_URL,
+    ),
+    'process.env.IOS_APP_CLIP_BASE_URL': JSON.stringify(
+      process.env.IOS_APP_CLIP_BASE_URL,
+    ),
+    'process.env.ANDROID_APP_CLIP_BASE_URL': JSON.stringify(
+      process.env.ANDROID_APP_CLIP_BASE_URL,
+    ),
     'process.env.WATSON_URL': JSON.stringify(process.env.WATSON_URL),
   }),
 ];
 
 export default [
-    {
-      input: 'src/index.ts',
-      output: [
-        {file: 'dist/index.js', format: 'cjs'},
-        {file: 'dist/index.mjs', format: 'es'},
-      ],
-      plugins: PLUGINS,
-    },
-    {
-      input: 'src/components.ts',
-      output: [
-        {file: 'dist/components.js', format: 'cjs'},
-        {file: 'dist/components.mjs', format: 'es'},
-      ],
-      plugins: PLUGINS,
-    },
-  ];
+  {
+    input: 'src/index.ts',
+    output: [
+      { file: 'dist/index.js', format: 'cjs' },
+      { file: 'dist/index.mjs', format: 'es' },
+    ],
+    plugins: PLUGINS,
+  },
+  {
+    input: 'src/types/index.ts',
+    output: [
+      { file: 'dist/components.js', format: 'cjs' },
+      { file: 'dist/components.mjs', format: 'es' },
+    ],
+    plugins: PLUGINS,
+  },
+];
