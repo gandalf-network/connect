@@ -105,10 +105,10 @@ class Connect {
 
     let BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
     switch (this.platform) {
-      case 'ANDROID':
+      case Platform.android:
         BASE_URL = ANDROID_APP_CLIP_BASE_URL;
         break;
-      case 'IOS':
+      case Platform.ios:
         BASE_URL = IOS_APP_CLIP_BASE_URL;
         break;
     }

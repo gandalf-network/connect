@@ -4,8 +4,6 @@ import Connect from "../index";
 import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../lib/constants";
 import { Services, Platform } from "../types";
 
-console.log(process.env.IOS_APP_CLIP_BASE_URL)
-
 jest.mock("../api/publicKey", () => ({
   verifyPublicKey: jest.fn(),
 }));
