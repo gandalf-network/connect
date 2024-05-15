@@ -23,7 +23,7 @@ class Connect {
   publicKey: string;
   redirectURL: string;
   services: Services;
-  platform: Platform = Platform.universal;
+  platform: Platform = Platform.ios;
   verificationComplete: boolean = false;
 
   constructor(input: ConnectInput) {
@@ -33,7 +33,7 @@ class Connect {
     this.publicKey = input.publicKey;
     this.redirectURL = input.redirectURL;
     this.services = input.services;
-    this.platform = input.platform ? input.platform : Platform.universal;
+    this.platform = input.platform ? input.platform : Platform.ios;
   }
 
   async generateURL(): Promise<string> {
@@ -103,13 +103,13 @@ class Connect {
     const encodedRedirectURL = encodeURIComponent(redirectURL);
     const encodedPublicKey = encodeURIComponent(publicKey);
 
-    let BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
+    let BASE_URL = IOS_APP_CLIP_BASE_URL;
     switch (this.platform) {
       case Platform.android:
         BASE_URL = ANDROID_APP_CLIP_BASE_URL;
         break;
-      case Platform.ios:
-        BASE_URL = IOS_APP_CLIP_BASE_URL;
+      case Platform.universal:
+        BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
         break;
     }
     return `${BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`;

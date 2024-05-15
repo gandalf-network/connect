@@ -40,7 +40,7 @@ describe("Connect SDK", () => {
 
       expect(connect.publicKey).toEqual(publicKey);
       expect(connect.redirectURL).toEqual(redirectURL);
-      expect(connect.platform).toEqual(Platform.universal);
+      expect(connect.platform).toEqual(Platform.ios);
     });
 
     it("should strip the redirect url of trailing slashes", async () => {
@@ -52,9 +52,9 @@ describe("Connect SDK", () => {
 
     it("should set the platform", async () => {
       const redirectURL = "https://example.com/";
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.ios });
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
 
-      expect(connect.platform).toEqual(Platform.ios);
+      expect(connect.platform).toEqual(Platform.universal);
     });
   });
 
@@ -126,19 +126,19 @@ describe("Connect SDK", () => {
     const encodedRedirectURL = encodeURIComponent(redirectURL);
     const encodedPublicKey = encodeURIComponent(publicKey);
 
-    it("should generate a Universal connect URL", async () => {
+    it("should generate an IOS connect URL", async () => {
       const connect = new Connect({ publicKey, redirectURL, services });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${UNIVERSAL_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${IOS_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
       );
     });
 
-    it("should generate an IOS connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.ios });
+    it("should generate a universal connect URL", async () => {
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${IOS_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${UNIVERSAL_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
       );
     });
 
