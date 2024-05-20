@@ -2,7 +2,7 @@ import { verifyPublicKey } from "../api/publicKey";
 import { getSupportedServices } from "../api/supportedServices";
 import Connect from "../index";
 import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../lib/constants";
-import { Services, Platform } from "../types";
+import { InputData, Platform } from "../types";
 
 jest.mock("../api/publicKey", () => ({
   verifyPublicKey: jest.fn(),
@@ -21,12 +21,24 @@ jest.mock("qr-code-styling", () =>
 describe("Connect SDK", () => {
   const publicKey = "examplePublicKey";
   const redirectURL = "https://example.com";
-  const services = { netflix: true };
-  const stringServices = JSON.stringify(services);
+  const data: InputData = {
+    uber: {
+      traits: ["rating"],
+      activities: ["trip"],
+    },
+    netflix: {
+        traits: ["plan"],
+        activities: ["watch"]
+    },
+    instacart: {
+        activities: ["shop"]
+    }
+  }
+  const stringData = JSON.stringify(data);
 
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
-    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix"]);
+    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix", "uber", "instacart"]);
     global.URL.createObjectURL = jest.fn(() => "mocked-object-url");
   });
 
@@ -36,7 +48,7 @@ describe("Connect SDK", () => {
 
   describe("Constructor", () => {
     it("should initialize publicKey and redirectURL properly", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
 
       expect(connect.publicKey).toEqual(publicKey);
       expect(connect.redirectURL).toEqual(redirectURL);
@@ -45,14 +57,14 @@ describe("Connect SDK", () => {
 
     it("should strip the redirect url of trailing slashes", async () => {
       const redirectURL = "https://example.com/";
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
 
       expect(connect.redirectURL).toEqual("https://example.com");
     });
 
     it("should set the platform", async () => {
       const redirectURL = "https://example.com/";
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const connect = new Connect({ publicKey, redirectURL, data, platform: Platform.universal });
 
       expect(connect.platform).toEqual(Platform.universal);
     });
@@ -60,7 +72,7 @@ describe("Connect SDK", () => {
 
   describe("allValidations", () => {
     it("should pass all validations and call verifyPublicKey only once", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
       await connect.generateURL();
 
       expect(connect.verificationComplete).toEqual(true);
@@ -69,7 +81,7 @@ describe("Connect SDK", () => {
 
     it("should throw error if publicKey is invalid", async () => {
       const publicKey = "invalidPublicKey";
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
       (verifyPublicKey as jest.Mock).mockResolvedValue(false);
 
       await expect(connect.generateURL()).rejects.toThrow(
@@ -83,7 +95,7 @@ describe("Connect SDK", () => {
       const connect = new Connect({
         publicKey,
         redirectURL: invalidRedirectURL,
-        services,
+        data,
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
@@ -93,67 +105,85 @@ describe("Connect SDK", () => {
     });
 
     it("should throw error if invalid service is passed", async () => {
-      const invalidServices = { twitter: true, showmax: false } as Services;
+      const invalidDataServices = {
+        facebook: {
+          traits: ["plan"],
+          activities: ["watch"]
+        },
+        zoom: {
+          traits: ["fake"]
+        }
+      } as InputData;
+
       const connect = new Connect({
         publicKey,
         redirectURL,
-        services: invalidServices,
+        data: invalidDataServices,
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        `These services ${Object.keys(invalidServices).join(" ")} are unsupported`,
+        `These services ${Object.keys(invalidDataServices).join(" ")} are unsupported`,
       );
       expect(connect.verificationComplete).toEqual(false);
     });
 
-    it("should throw error if no required service is passed", async () => {
-      const invalidServices = { NETFLIX: false };
+    it("should throw error if no required trait or activity is passed", async () => {
+      const invalidDataServices = {
+        netflix: {
+          traits: [],
+          activities: []
+        },
+        uber: {
+          traits: []
+        }
+      } as InputData;
+      
       const connect = new Connect({
         publicKey,
         redirectURL,
-        services: invalidServices,
+        data: invalidDataServices,
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        "At least one service has to be required",
+        "At least one trait or activity is required",
       );
       expect(connect.verificationComplete).toEqual(false);
     });
   });
 
   describe("generateURL", () => {
-    const encodedServices = encodeURIComponent(stringServices);
+    const encodedData = encodeURIComponent(btoa(stringData));
     const encodedRedirectURL = encodeURIComponent(redirectURL);
     const encodedPublicKey = encodeURIComponent(publicKey);
 
     it("should generate an IOS connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${IOS_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${IOS_APP_CLIP_BASE_URL}&publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
 
     it("should generate a universal connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const connect = new Connect({ publicKey, redirectURL, data, platform: Platform.universal });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${UNIVERSAL_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
 
     it("should generate an android connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.android });
+      const connect = new Connect({ publicKey, redirectURL, data, platform: Platform.android });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${ANDROID_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
   });
 
   describe("generateQRCode", () => {
     it("should create QR code with correct options", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services });
+      const connect = new Connect({ publicKey, redirectURL, data });
       const qrCodeUrl = await connect.generateQRCode();
       expect(qrCodeUrl).toBeTruthy();
     });

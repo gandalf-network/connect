@@ -9,7 +9,13 @@ import qrCodeStyle from './lib/qrCode-style';
 import { Source } from './api/__generated__/graphql';
 import { getSupportedServices } from './api/supportedServices';
 import GandalfError from './lib/errors';
-import { Services, Platform, ConnectInput, GandalfErrorCode } from './types';
+import {
+  Platform,
+  ConnectInput,
+  GandalfErrorCode,
+  InputData,
+  Service,
+} from './types';
 
 let QRCodeStyling: any;
 
@@ -22,7 +28,7 @@ if (typeof window !== 'undefined') {
 class Connect {
   publicKey: string;
   redirectURL: string;
-  services: Services;
+  data: InputData;
   platform: Platform = Platform.ios;
   verificationComplete: boolean = false;
 
@@ -32,15 +38,15 @@ class Connect {
     }
     this.publicKey = input.publicKey;
     this.redirectURL = input.redirectURL;
-    this.services = input.services;
+    this.data = input.data;
     this.platform = input.platform ? input.platform : Platform.ios;
   }
 
   async generateURL(): Promise<string> {
-    await this.allValidations(this.publicKey, this.redirectURL, this.services);
-    const services = JSON.stringify(this.services);
+    await this.allValidations(this.publicKey, this.redirectURL, this.data);
+    const data = JSON.stringify(this.data);
     const appClipURL = this.encodeComponents(
-      services,
+      data,
       this.redirectURL,
       this.publicKey,
     );
@@ -95,14 +101,10 @@ class Connect {
   }
 
   private encodeComponents(
-    services: string,
-    redirectURL: string,
+    data: string,
+    redirectUrl: string,
     publicKey: string,
   ): string {
-    const encodedServices = encodeURIComponent(services);
-    const encodedRedirectURL = encodeURIComponent(redirectURL);
-    const encodedPublicKey = encodeURIComponent(publicKey);
-
     let BASE_URL = IOS_APP_CLIP_BASE_URL;
     switch (this.platform) {
       case Platform.android:
@@ -112,19 +114,32 @@ class Connect {
         BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
         break;
     }
-    return `${BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`;
+
+    const base64Data = btoa(data);
+    const url = new URL(BASE_URL);
+    const params: Record<string, string> = {
+      publicKey,
+      redirectUrl,
+      data: base64Data,
+    };
+
+    Object.keys(params).forEach((key) =>
+      url.searchParams.append(key, params[key]),
+    );
+
+    return url.toString();
   }
 
   private async allValidations(
     publicKey: string,
     redirectURL: string,
-    services: Services,
+    data: InputData,
   ): Promise<void> {
     if (!this.verificationComplete) {
       await Connect.validatePublicKey(publicKey);
       Connect.validateRedirectURL(redirectURL);
-      const cleanServices = await Connect.validateInputServices(services);
-      this.services = cleanServices;
+      const cleanServices = await Connect.validateInputData(data);
+      this.data = cleanServices;
     }
 
     this.verificationComplete = true;
@@ -140,21 +155,19 @@ class Connect {
     }
   }
 
-  private static async validateInputServices(
-    input: Services,
-  ): Promise<Services> {
+  private static async validateInputData(input: InputData): Promise<InputData> {
     const services = await getSupportedServices();
-    const cleanServices: Services = {};
+    const cleanServices: InputData = {};
 
     let unsupportedServices: string[] = [];
-    let requiredServices = 0;
     for (const key in input) {
       if (!services.includes(key.toLowerCase() as Source)) {
         unsupportedServices = [...unsupportedServices, key];
         continue;
       }
-      if (input[key as Source]) requiredServices++;
-      cleanServices[key.toLocaleLowerCase()] = input[key as Source];
+
+      this.validateInputService(input[key]);
+      cleanServices[key.toLowerCase()] = input[key as Source];
     }
 
     if (unsupportedServices.length > 0) {
@@ -164,13 +177,19 @@ class Connect {
       );
     }
 
-    if (requiredServices < 1) {
+    return cleanServices;
+  }
+
+  private static validateInputService(input: Service): void {
+    if (
+      (input.activities?.length ?? 0) < 1 &&
+      (input.traits?.length ?? 0) < 1
+    ) {
       throw new GandalfError(
-        'At least one service has to be required',
+        'At least one trait or activity is required',
         GandalfErrorCode.InvalidService,
       );
     }
-    return cleanServices;
   }
 
   private static validateRedirectURL(url: string): void {
