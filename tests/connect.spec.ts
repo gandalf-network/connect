@@ -1,14 +1,14 @@
-import { verifyPublicKey } from "../api/publicKey";
-import { getSupportedServices } from "../api/supportedServices";
-import Connect from "../index";
-import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../lib/constants";
-import { InputData, Platform } from "../types";
+import { verifyPublicKey } from "../src/api/publicKey";
+import { getSupportedServices } from "../src/api/supportedServices";
+import Connect from "../src/index";
+import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../src/lib/constants";
+import { InputData, Platform } from "../src/types";
 
-jest.mock("../api/publicKey", () => ({
+jest.mock("../src/api/publicKey", () => ({
   verifyPublicKey: jest.fn(),
 }));
 
-jest.mock("../api/supportedServices", () => ({
+jest.mock("../src/api/supportedServices", () => ({
   getSupportedServices: jest.fn(),
 }));
 

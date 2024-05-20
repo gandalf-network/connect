@@ -6,14 +6,14 @@ const redirectURL = "https://example.com"
 const data: InputData = {
     uber: {
         traits: ["rating"],
-        activites: ["trip"],
+        activities: ["trip"],
     },
     netflix: {
         traits: ["plan"],
-        activites: ["watch"]
+        activities: ["watch"]
     },
     instacart: {
-        activites: ["shop"]
+        activities: ["shop"]
     }
 }
 
