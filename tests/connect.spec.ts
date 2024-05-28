@@ -26,13 +26,6 @@ describe("Connect SDK", () => {
       traits: ["rating"],
       activities: ["trip"],
     },
-    netflix: {
-        traits: ["plan"],
-        activities: ["watch"]
-    },
-    instacart: {
-        activities: ["shop"]
-    }
   }
   const stringData = JSON.stringify(data);
 
@@ -110,9 +103,6 @@ describe("Connect SDK", () => {
           traits: ["plan"],
           activities: ["watch"]
         },
-        zoom: {
-          traits: ["fake"]
-        }
       } as InputData;
 
       const connect = new Connect({
@@ -133,9 +123,6 @@ describe("Connect SDK", () => {
           traits: [],
           activities: []
         },
-        uber: {
-          traits: []
-        }
       } as InputData;
       
       const connect = new Connect({
@@ -146,6 +133,33 @@ describe("Connect SDK", () => {
 
       await expect(connect.generateURL()).rejects.toThrow(
         "At least one trait or activity is required",
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it("should throw an error if more than one service is passsed", async () => {
+      const invalidDataServices: InputData = {
+        uber: {
+          traits: ["rating"],
+          activities: ["trip"],
+        },
+        netflix: {
+            traits: ["plan"],
+            activities: ["watch"]
+        },
+        instacart: {
+            activities: ["shop"]
+        }
+      } as InputData;
+      
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        data: invalidDataServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        "Only one service is supported per Connect URL",
       );
       expect(connect.verificationComplete).toEqual(false);
     });

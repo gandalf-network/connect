@@ -160,7 +160,17 @@ class Connect {
     const cleanServices: InputData = {};
 
     let unsupportedServices: string[] = [];
-    for (const key in input) {
+
+    const keys = Object.keys(input);
+
+    if (keys.length > 1) {
+      throw new GandalfError(
+        `Only one service is supported per Connect URL`,
+        GandalfErrorCode.InvalidService,
+      );
+    }
+
+    for (const key of keys) {
       if (!services.includes(key.toLowerCase() as Source)) {
         unsupportedServices = [...unsupportedServices, key];
         continue;
