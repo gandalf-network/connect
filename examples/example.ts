@@ -8,13 +8,6 @@ const data: InputData = {
         traits: ["rating"],
         activities: ["trip"],
     },
-    netflix: {
-        traits: ["plan"],
-        activities: ["watch"]
-    },
-    instacart: {
-        activities: ["shop"]
-    }
 }
 
 async function example() {
