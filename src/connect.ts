@@ -38,7 +38,7 @@ class Connect {
     }
     this.publicKey = input.publicKey;
     this.redirectURL = input.redirectURL;
-    this.data = input.data;
+    this.data = input.services;
     this.platform = input.platform ? input.platform : Platform.ios;
   }
 
@@ -176,8 +176,17 @@ class Connect {
         continue;
       }
 
-      this.validateInputService(input[key]);
-      cleanServices[key.toLowerCase()] = input[key as Source];
+	  const service = input[key]
+	  if (typeof service === 'boolean') {
+		if (!service) throw new GandalfError(
+			'At least one service has to be required',
+			GandalfErrorCode.InvalidService,
+		);
+		cleanServices[key.toLowerCase()] = input[key as Source];
+	  } else {
+		this.validateInputService(service);
+		cleanServices[key.toLowerCase()] = input[key as Source];
+	  }
     }
 
     if (unsupportedServices.length > 0) {

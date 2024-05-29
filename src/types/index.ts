@@ -1,5 +1,5 @@
 export type InputData = {
-  [key: string]: Service;
+  [key: string]: boolean | Service;
 };
 
 export type Service = {
@@ -16,7 +16,7 @@ export enum Platform {
 export type ConnectInput = {
   publicKey: string;
   redirectURL: string;
-  data: InputData;
+  services: InputData;
   platform?: Platform;
 };
 

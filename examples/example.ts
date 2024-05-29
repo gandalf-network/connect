@@ -3,7 +3,7 @@ import { InputData } from "../src/types";
 
 const publicKey = "0x0297bb4f88a65b82c08fd20afb1259b7027dc996c8941e0c5917a452d538cd0da9";
 const redirectURL = "https://example.com"
-const data: InputData = {
+const services: InputData = {
     uber: {
         traits: ["rating"],
         activities: ["trip"],
@@ -11,7 +11,7 @@ const data: InputData = {
 }
 
 async function example() {
-    const connect = new Connect({publicKey, redirectURL, data})
+    const connect = new Connect({publicKey, redirectURL, services})
 
     // Generate the Connect URL
     const url = await connect.generateURL()
