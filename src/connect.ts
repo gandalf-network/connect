@@ -29,6 +29,7 @@ class Connect {
   publicKey: string;
   redirectURL: string;
   data: InputData;
+  gandalfTraits: string[] = [];
   platform: Platform = Platform.ios;
   verificationComplete: boolean = false;
 
@@ -161,32 +162,33 @@ class Connect {
 
     let unsupportedServices: string[] = [];
 
-    const keys = Object.keys(input);
+    const keys = Object.keys(input).map((key) => key.toLowerCase());
 
-    if (keys.length > 1) {
+    if (keys.length > 2 || (keys.length === 2 && !keys.includes('gandalf'))) {
       throw new GandalfError(
-        `Only one service is supported per Connect URL`,
+        `Only one service is supported per Connect URL, except when one of them is Gandalf`,
         GandalfErrorCode.InvalidService,
       );
     }
 
     for (const key of keys) {
-      if (!services.includes(key.toLowerCase() as Source)) {
+      if (!services.includes(key as Source)) {
         unsupportedServices = [...unsupportedServices, key];
         continue;
       }
 
-	  const service = input[key]
-	  if (typeof service === 'boolean') {
-		if (!service) throw new GandalfError(
-			'At least one service has to be required',
-			GandalfErrorCode.InvalidService,
-		);
-		cleanServices[key.toLowerCase()] = input[key as Source];
-	  } else {
-		this.validateInputService(service);
-		cleanServices[key.toLowerCase()] = input[key as Source];
-	  }
+      const service = input[key];
+      if (typeof service === 'boolean') {
+        if (!service)
+          throw new GandalfError(
+            'At least one service has to be required',
+            GandalfErrorCode.InvalidService,
+          );
+        cleanServices[key.toLowerCase()] = input[key as Source];
+      } else {
+        this.validateInputService(service);
+        cleanServices[key.toLowerCase()] = input[key as Source];
+      }
     }
 
     if (unsupportedServices.length > 0) {

@@ -8,6 +8,9 @@ const services: InputData = {
         traits: ["rating"],
         activities: ["trip"],
     },
+    gandalf: {
+        traits: ["email"]
+    }
 }
 
 async function example() {
