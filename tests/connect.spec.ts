@@ -1,14 +1,14 @@
-import { verifyPublicKey } from "../api/publicKey";
-import { getSupportedServices } from "../api/supportedServices";
-import Connect from "../index";
-import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../lib/constants";
-import { Services, Platform } from "../types";
+import { verifyPublicKey } from "../src/api/publicKey";
+import { getSupportedServices } from "../src/api/supportedServices";
+import Connect from "../src/index";
+import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../src/lib/constants";
+import { InputData, Platform } from "../src/types";
 
-jest.mock("../api/publicKey", () => ({
+jest.mock("../src/api/publicKey", () => ({
   verifyPublicKey: jest.fn(),
 }));
 
-jest.mock("../api/supportedServices", () => ({
+jest.mock("../src/api/supportedServices", () => ({
   getSupportedServices: jest.fn(),
 }));
 
@@ -21,12 +21,17 @@ jest.mock("qr-code-styling", () =>
 describe("Connect SDK", () => {
   const publicKey = "examplePublicKey";
   const redirectURL = "https://example.com";
-  const services = { netflix: true };
-  const stringServices = JSON.stringify(services);
+  const services: InputData = {
+    uber: {
+      traits: ["rating"],
+      activities: ["trip"],
+    },
+  }
+  const stringData = JSON.stringify(services);
 
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
-    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix"]);
+    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix", "uber", "instacart"]);
     global.URL.createObjectURL = jest.fn(() => "mocked-object-url");
   });
 
@@ -93,36 +98,75 @@ describe("Connect SDK", () => {
     });
 
     it("should throw error if invalid service is passed", async () => {
-      const invalidServices = { twitter: true, showmax: false } as Services;
+      const invalidDataServices = {
+        facebook: {
+          traits: ["plan"],
+          activities: ["watch"]
+        },
+      } as InputData;
+
       const connect = new Connect({
         publicKey,
         redirectURL,
-        services: invalidServices,
+        services: invalidDataServices,
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        `These services ${Object.keys(invalidServices).join(" ")} are unsupported`,
+        `These services ${Object.keys(invalidDataServices).join(" ")} are unsupported`,
       );
       expect(connect.verificationComplete).toEqual(false);
     });
 
-    it("should throw error if no required service is passed", async () => {
-      const invalidServices = { NETFLIX: false };
+    it("should throw error if no required trait or activity is passed", async () => {
+      const invalidDataServices = {
+        netflix: {
+          traits: [],
+          activities: []
+        },
+      } as InputData;
+      
       const connect = new Connect({
         publicKey,
         redirectURL,
-        services: invalidServices,
+        services: invalidDataServices,
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        "At least one service has to be required",
+        "At least one trait or activity is required",
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it("should throw an error if more than one service is passsed", async () => {
+      const invalidDataServices: InputData = {
+        uber: {
+          traits: ["rating"],
+          activities: ["trip"],
+        },
+        netflix: {
+            traits: ["plan"],
+            activities: ["watch"]
+        },
+        instacart: {
+            activities: ["shop"]
+        }
+      } as InputData;
+      
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: invalidDataServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        "Only one service is supported per Connect URL",
       );
       expect(connect.verificationComplete).toEqual(false);
     });
   });
 
   describe("generateURL", () => {
-    const encodedServices = encodeURIComponent(stringServices);
+    const encodedData = encodeURIComponent(btoa(stringData));
     const encodedRedirectURL = encodeURIComponent(redirectURL);
     const encodedPublicKey = encodeURIComponent(publicKey);
 
@@ -130,7 +174,7 @@ describe("Connect SDK", () => {
       const connect = new Connect({ publicKey, redirectURL, services });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${IOS_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${IOS_APP_CLIP_BASE_URL}&publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
 
@@ -138,7 +182,7 @@ describe("Connect SDK", () => {
       const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${UNIVERSAL_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
 
@@ -146,7 +190,7 @@ describe("Connect SDK", () => {
       const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.android });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${ANDROID_APP_CLIP_BASE_URL}&services=${encodedServices}&redirectUrl=${encodedRedirectURL}&publicKey=${encodedPublicKey}`,
+        `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
   });
@@ -188,6 +232,40 @@ describe("Connect SDK", () => {
     it("should get the supported services", async () => {
       await Connect.getSupportedServices();
       expect(getSupportedServices as jest.Mock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('backwardCompatibility', () => {
+    it('should throw error if invalid service is passed', async () => {
+      const invalidServices = {"twitter": true} as InputData
+      const connect = new Connect({publicKey, redirectURL, services: invalidServices});
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        `These services ${Object.keys(invalidServices).join(' ')} are unsupported`
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it('should throw error if no required service is passed', async () => {
+      const invalidServices = {"netflix": false}
+      const connect = new Connect({publicKey, redirectURL, services: invalidServices});
+
+      await expect(connect.generateURL()).rejects.toThrow('At least one service has to be required');
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it("should generate a universal connect URL", async () => {
+      const services = {"netflix": true};
+      const stringData = JSON.stringify(services);
+      const encodedData = encodeURIComponent(btoa(stringData));
+      const encodedRedirectURL = encodeURIComponent(redirectURL);
+      const encodedPublicKey = encodeURIComponent(publicKey);
+
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const generatedURL = await connect.generateURL();
+      expect(generatedURL).toEqual(
+        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
+      );
     });
   });
 });

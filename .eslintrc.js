@@ -15,7 +15,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js', 'codegen.ts', 'jest.config.js', 'rollup.config.js', 'tests'],
+  ignorePatterns: ['.eslintrc.js', 'codegen.ts', 'jest.config.js', 'rollup.config.js', 'tests', 'examples'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
