@@ -29,7 +29,6 @@ class Connect {
   publicKey: string;
   redirectURL: string;
   data: InputData;
-  gandalfTraits: string[] = [];
   platform: Platform = Platform.ios;
   verificationComplete: boolean = false;
 
