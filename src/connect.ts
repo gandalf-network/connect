@@ -165,9 +165,9 @@ class Connect {
 
     const keys = Object.keys(input).map((key) => key.toLowerCase());
 
-    if (keys.length > 1) {
+    if (keys.length > 2 || (keys.length === 2 && !keys.includes('gandalf'))) {
       throw new GandalfError(
-        `Only one service is supported per Connect URL`,
+        `Only one non Gandalf service is supported per Connect URL`,
         GandalfErrorCode.InvalidService,
       );
     }

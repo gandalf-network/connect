@@ -26,6 +26,9 @@ describe("Connect SDK", () => {
       traits: ["rating"],
       activities: ["trip"],
     },
+    gandalf: {
+      traits: ["email"],
+    }
   }
   const stringData = JSON.stringify(services);
 
@@ -206,7 +209,7 @@ describe("Connect SDK", () => {
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        "Only one service is supported per Connect URL",
+        "Only one non Gandalf service is supported per Connect URL",
       );
       expect(connect.verificationComplete).toEqual(false);
     });

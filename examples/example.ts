@@ -8,6 +8,9 @@ const services: InputData = {
         traits: [TraitLabel.Plan],
         activities: [ActivityType.Trip],
     },
+    gandalf: {
+        traits: ["email"]
+    }
 }
 
 async function example() {
