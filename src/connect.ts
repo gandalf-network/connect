@@ -7,7 +7,10 @@ import {
 import qrCodeStyle from './lib/qrCode-style';
 
 import { Source } from './api/__generated__/graphql';
-import { getSupportedServices } from './api/supportedServices';
+import {
+  getSupportedServicesAndTraits,
+  SupportedServicesAndTraits,
+} from './api/supportedServices';
 import GandalfError from './lib/errors';
 import {
   Platform,
@@ -81,9 +84,8 @@ class Connect {
     }
   }
 
-  static async getSupportedServices(): Promise<string[]> {
-    const services = await getSupportedServices();
-    return services;
+  static async getSupportedServicesAndTraits() {
+    return await getSupportedServicesAndTraits();
   }
 
   static getDataKeyFromURL(redirectURL: string): string {
@@ -156,7 +158,7 @@ class Connect {
   }
 
   private static async validateInputData(input: InputData): Promise<InputData> {
-    const services = await getSupportedServices();
+    const supportedServicesAndTraits = await getSupportedServicesAndTraits();
     const cleanServices: InputData = {};
 
     let unsupportedServices: string[] = [];
@@ -165,13 +167,13 @@ class Connect {
 
     if (keys.length > 2 || (keys.length === 2 && !keys.includes('gandalf'))) {
       throw new GandalfError(
-        `Only one service is supported per Connect URL, except when one of them is Gandalf`,
+        `Only one non Gandalf service is supported per Connect URL`,
         GandalfErrorCode.InvalidService,
       );
     }
 
     for (const key of keys) {
-      if (!services.includes(key as Source)) {
+      if (!supportedServicesAndTraits.services.includes(key as Source)) {
         unsupportedServices = [...unsupportedServices, key];
         continue;
       }
@@ -185,14 +187,14 @@ class Connect {
           );
         cleanServices[key.toLowerCase()] = input[key as Source];
       } else {
-        this.validateInputService(service);
+        this.validateInputService(service, supportedServicesAndTraits);
         cleanServices[key.toLowerCase()] = input[key as Source];
       }
     }
 
     if (unsupportedServices.length > 0) {
       throw new GandalfError(
-        `These services ${unsupportedServices.join(' ')} are unsupported`,
+        `These services [ ${unsupportedServices.join(', ')} ] are unsupported`,
         GandalfErrorCode.InvalidService,
       );
     }
@@ -200,13 +202,51 @@ class Connect {
     return cleanServices;
   }
 
-  private static validateInputService(input: Service): void {
+  private static validateInputService(
+    input: Service,
+    supportedServicesAndTraits: SupportedServicesAndTraits,
+  ): void {
     if (
       (input.activities?.length ?? 0) < 1 &&
       (input.traits?.length ?? 0) < 1
     ) {
       throw new GandalfError(
         'At least one trait or activity is required',
+        GandalfErrorCode.InvalidService,
+      );
+    }
+
+    let unsupportedActivities: string[] = [];
+    let unsupportedTraits: string[] = [];
+
+    if (input.activities) {
+      for (const key of input.activities) {
+        if (!supportedServicesAndTraits.activities.includes(key)) {
+          unsupportedActivities = [...unsupportedActivities, key];
+          continue;
+        }
+      }
+    }
+
+    if (input.traits) {
+      for (const key of input.traits) {
+        if (!supportedServicesAndTraits.traits.includes(key)) {
+          unsupportedTraits = [...unsupportedTraits, key];
+          continue;
+        }
+      }
+    }
+
+    if (unsupportedActivities.length > 0) {
+      throw new GandalfError(
+        `These activities [ ${unsupportedActivities.join(', ')} ] are unsupported`,
+        GandalfErrorCode.InvalidService,
+      );
+    }
+
+    if (unsupportedTraits.length > 0) {
+      throw new GandalfError(
+        `These traits [ ${unsupportedTraits.join(', ')} ] are unsupported`,
         GandalfErrorCode.InvalidService,
       );
     }

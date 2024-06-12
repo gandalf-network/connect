@@ -1,12 +1,12 @@
 import Connect from "../src/connect";
-import { InputData } from "../src/types";
+import { ActivityType, InputData, TraitLabel } from "../src/types";
 
 const publicKey = "0x0297bb4f88a65b82c08fd20afb1259b7027dc996c8941e0c5917a452d538cd0da9";
 const redirectURL = "https://example.com"
 const services: InputData = {
     uber: {
-        traits: ["rating"],
-        activities: ["trip"],
+        traits: [TraitLabel.Plan],
+        activities: [ActivityType.Trip],
     },
     gandalf: {
         traits: ["email"]

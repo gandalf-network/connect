@@ -32,7 +32,16 @@ import Connect from "@gandalf-network/connect";
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
-    services: { "NETFLIX": true } // At least one service is required
+    services: 
+    {
+        uber: {
+            traits: ["rating"], // At least one trait or activity is required
+            activities: ["trip"],
+        },
+        gandalf: {
+            traits: ["email"]
+        }
+    } // Only one non "Gandalf" service (e.g "netflix", "instacart") is supported per Connect URL
 })
 ```
 
@@ -43,7 +52,16 @@ const Connect = require("@gandalf-network/connect");
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
-    services: { "NETFLIX": true } // At least one service is required
+    services: 
+    {
+        uber: {
+            traits: ["rating"], // At least one trait or activity is required
+            activities: ["trip"],
+        },
+        gandalf: {
+            traits: ["email"]
+        }
+    } // Only one non "Gandalf" service (e.g "uber", "amazon") is supported per Connect URL
 })
 ```
 
