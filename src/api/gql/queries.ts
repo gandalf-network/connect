@@ -1,4 +1,4 @@
-import { gql } from "../__generated__";
+import { gql } from '../__generated__';
 
 export const GET_APP_BY_PUBLIC_KEY = gql(`
   query GetAppByPublicKey($publicKey: String!) {
@@ -9,9 +9,21 @@ export const GET_APP_BY_PUBLIC_KEY = gql(`
   }
 `);
 
-export const GET_SUPORTED_SERVICES = gql(`
+export const GET_SUPORTED_SERVICES_AND_TRAITS = gql(`
   query GetSupportedServices {
-    __type(name: "Source") {
+    __sourceType: __type(name: "Source") {
+      name
+      enumValues(includeDeprecated: false) {
+        name
+      }
+    }
+    __traitType: __type(name: "TraitLabel") {
+      name
+      enumValues(includeDeprecated: false) {
+        name
+      }
+    }
+    __activityType: __type(name: "ActivityType") {
       name
       enumValues(includeDeprecated: false) {
         name

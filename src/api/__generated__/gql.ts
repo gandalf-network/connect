@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query GetAppByPublicKey($publicKey: String!) {\n    getAppByPublicKey(publicKey: $publicKey) {\n        appName\n        gandalfID\n    }\n  }\n": types.GetAppByPublicKeyDocument,
-    "\n  query GetSupportedServices {\n    __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n": types.GetSupportedServicesDocument,
+    "\n  query GetSupportedServices {\n    __sourceType: __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __traitType: __type(name: \"TraitLabel\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __activityType: __type(name: \"ActivityType\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n": types.GetSupportedServicesDocument,
 };
 
 /**
@@ -38,7 +38,7 @@ export function gql(source: "\n  query GetAppByPublicKey($publicKey: String!) {\
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetSupportedServices {\n    __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetSupportedServices {\n    __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query GetSupportedServices {\n    __sourceType: __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __traitType: __type(name: \"TraitLabel\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __activityType: __type(name: \"ActivityType\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetSupportedServices {\n    __sourceType: __type(name: \"Source\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __traitType: __type(name: \"TraitLabel\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n    __activityType: __type(name: \"ActivityType\") {\n      name\n      enumValues(includeDeprecated: false) {\n        name\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
