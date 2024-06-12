@@ -49,6 +49,14 @@ export type ActivityResponse = {
   total: Scalars['Int64']['output'];
 };
 
+export enum ActivityType {
+  Play = 'PLAY',
+  Shop = 'SHOP',
+  Stay = 'STAY',
+  Trip = 'TRIP',
+  Watch = 'WATCH'
+}
+
 export type AmazonActivityMetadata = ActivityMetadata & {
   __typename?: 'AmazonActivityMetadata';
   /** Date indicating when the activity occurred. */
@@ -87,6 +95,36 @@ export type Application = {
   publicKey: Scalars['String']['output'];
 };
 
+export type BookingActivityMetadata = ActivityMetadata & {
+  __typename?: 'BookingActivityMetadata';
+  /** Reference identifying a booking */
+  bookingID: Scalars['String']['output'];
+  /** An array of bookings in a single purchase */
+  bookings: Array<BookingItem>;
+  /** The ticket or bill of a trip or stay */
+  price: Scalars['String']['output'];
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+};
+
+export type BookingItem = {
+  __typename?: 'BookingItem';
+  /** Activity type of the returned data source */
+  activityType: ActivityType;
+  /** The location of a trip */
+  address: Scalars['String']['output'];
+  /** The location of arrival of a booking flight */
+  arrivalLocation: Scalars['String']['output'];
+  /** The location where a booking flight takes off from */
+  depatureLocation: Scalars['String']['output'];
+  /** CheckOut time of a booking */
+  endDateTime: Scalars['Time']['output'];
+  /** An string listing the stops of a flight between its depature and arrival locations */
+  layoverLocations: Array<Maybe<Scalars['String']['output']>>;
+  /** CheckIn time of a booking */
+  startDateTime: Scalars['Time']['output'];
+};
+
 export enum ContentType {
   Music = 'MUSIC',
   Shorts = 'SHORTS',
@@ -103,20 +141,71 @@ export type Identifier = {
 
 export enum IdentifierType {
   Asin = 'ASIN',
+  Booking = 'BOOKING',
   Igdb = 'IGDB',
   Imdb = 'IMDB',
+  Instacart = 'INSTACART',
   Moby = 'MOBY',
   Playstation = 'PLAYSTATION',
   Rawg = 'RAWG',
   Tvdb = 'TVDB',
   Tvmaze = 'TVMAZE',
+  Uber = 'UBER',
+  Ubereats = 'UBEREATS',
   Youtube = 'YOUTUBE'
+}
+
+export type InstacartActivityMetadata = ActivityMetadata & {
+  __typename?: 'InstacartActivityMetadata';
+  /** The date the order was delivered */
+  dateDelivered: Scalars['Date']['output'];
+  /** The date the order was placed */
+  dateOrdered: Scalars['Date']['output'];
+  /** List of items ordered. */
+  items: Array<InstacartOrderItem>;
+  /** The name of the ratailer that handled the order. */
+  retailer: Scalars['String']['output'];
+  /** String indicating the status of the order */
+  statusString: Scalars['String']['output'];
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+  /** The total amount spent on this order. */
+  totalOrderAmountSpent: Scalars['String']['output'];
+};
+
+export enum InstacartItemStatus {
+  Found = 'FOUND',
+  Replaced = 'REPLACED',
+  Torefund = 'TOREFUND'
+}
+
+export type InstacartOrderItem = {
+  __typename?: 'InstacartOrderItem';
+  /** The Instacart ID of the item */
+  itemID: Scalars['String']['output'];
+  /** The name of the ordered item. */
+  productName: Scalars['String']['output'];
+  /** The quantity purchased. */
+  quantityPurchased: Scalars['Int64']['output'];
+  /** Enum indicating the status of the ordered item e.g found */
+  status: InstacartItemStatus;
+  /** The price per unit e.g (1.39 • 1 gal). */
+  unitPrice: Scalars['String']['output'];
+};
+
+export enum InstacartOrderStatus {
+  Complete = 'COMPLETE'
 }
 
 export type NetflixActivityMetadata = ActivityMetadata & {
   __typename?: 'NetflixActivityMetadata';
-  /** Date indicating when the activity occurred , formatted as (DD/MM/YYYY). */
+  /**
+   * Date indicating when the activity occurred , formatted as (DD/MM/YYYY).
+   * @deprecated use lastPlayedAt
+   */
   date?: Maybe<Scalars['Date']['output']>;
+  /** Date indicating when the activity was last played , formatted as (DD/MM/YYYY). */
+  lastPlayedAt?: Maybe<Scalars['Date']['output']>;
   /** List of identifiers associated with the activity's subject. */
   subject?: Maybe<Array<Maybe<Identifier>>>;
   /** The title of the Netflix activity */
@@ -148,15 +237,28 @@ export type Query = {
    */
   getAppByPublicKey: Application;
   /**
+   * get user traits for a specific source by datakey
+   *
+   * Returns: A response object containing a list of traits.
+   */
+  getTraits: Array<Maybe<Trait>>;
+  /**
    * Looks up a specific activity by its unique identifier (ID) and a data key.
    *
    * Returns: An Activity object containing detailed information about the requested activity.
    */
   lookupActivity: Activity;
+  /**
+   * Looks up a specific trait by its unique identifier (ID) and a data key.
+   *
+   * Returns: A trait object containing detailed information about the requested trait.
+   */
+  lookupTrait: Trait;
 };
 
 
 export type QueryGetActivityArgs = {
+  activityType?: InputMaybe<Array<InputMaybe<ActivityType>>>;
   dataKey: Scalars['String']['input'];
   limit: Scalars['Int64']['input'];
   page: Scalars['Int64']['input'];
@@ -169,16 +271,148 @@ export type QueryGetAppByPublicKeyArgs = {
 };
 
 
+export type QueryGetTraitsArgs = {
+  dataKey: Scalars['String']['input'];
+  labels: Array<InputMaybe<TraitLabel>>;
+  source: Source;
+};
+
+
 export type QueryLookupActivityArgs = {
   activityId: Scalars['UUID']['input'];
   dataKey: Scalars['String']['input'];
 };
 
+
+export type QueryLookupTraitArgs = {
+  dataKey: Scalars['String']['input'];
+  traitId: Scalars['UUID']['input'];
+};
+
 export enum Source {
   Amazon = 'AMAZON',
+  Booking = 'BOOKING',
+  Instacart = 'INSTACART',
+  Instagram = 'INSTAGRAM',
   Netflix = 'NETFLIX',
   Playstation = 'PLAYSTATION',
+  Uber = 'UBER',
+  Ubereats = 'UBEREATS',
+  X = 'X',
   Youtube = 'YOUTUBE'
+}
+
+/** Represents a User Trait. */
+export type Trait = {
+  __typename?: 'Trait';
+  /** Unique identifier for the activity. */
+  id: Scalars['UUID']['output'];
+  /** The label of the trait. */
+  label: TraitLabel;
+  /** The source of the trait. */
+  source: Source;
+  /** The timestamp when the trait was recorded. */
+  timestamp: Scalars['Time']['output'];
+  /** The value of the trait. */
+  value: Scalars['String']['output'];
+};
+
+/** Represents the labels for different user traits. */
+export enum TraitLabel {
+  /** Date when the user account was created. */
+  AccountCreatedOn = 'ACCOUNT_CREATED_ON',
+  /** The number of account following the user. */
+  FollowerCount = 'FOLLOWER_COUNT',
+  /** The number of accounts followed by the user. */
+  FollowingCount = 'FOLLOWING_COUNT',
+  /** User's genius level. */
+  GeniusLevel = 'GENIUS_LEVEL',
+  /** The number of orders the user has made on the platform. */
+  OrderCount = 'ORDER_COUNT',
+  /** User plan. */
+  Plan = 'PLAN',
+  /** The number of posts the user has made on the platform. */
+  PostCount = 'POST_COUNT',
+  /** Indicates if the user is a prime subscriber. */
+  PrimeSubscriber = 'PRIME_SUBSCRIBER',
+  /** User rating. */
+  Rating = 'RATING',
+  /** Number of trips taken by the user. */
+  TripCount = 'TRIP_COUNT',
+  /** The users profile name. */
+  Username = 'USERNAME'
+}
+
+export enum TripStatus {
+  Canceled = 'CANCELED',
+  Completed = 'COMPLETED',
+  Unfulfilled = 'UNFULFILLED'
+}
+
+export type UberActivityMetadata = ActivityMetadata & {
+  __typename?: 'UberActivityMetadata';
+  /** This indicates the start time of the trip */
+  beginTripTime: Scalars['Time']['output'];
+  /** A string indicating the city the trip originated from */
+  city: Scalars['String']['output'];
+  /** A string indicating the cost of the trip */
+  cost: Scalars['String']['output'];
+  /** Distance covered from pickup to dropoff location */
+  distance: Scalars['String']['output'];
+  /** This indicates the end time of the trip */
+  dropoffTime?: Maybe<Scalars['Time']['output']>;
+  /** Enum indicating the status of a trip */
+  status: TripStatus;
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+};
+
+export type UberEatsActivityMetadata = ActivityMetadata & {
+  __typename?: 'UberEatsActivityMetadata';
+  /** The currency the order was priced in. */
+  currency: Scalars['String']['output'];
+  /** Date indicating when the order was made. */
+  date?: Maybe<Scalars['Date']['output']>;
+  /** List of items ordered. */
+  items: Array<UberEatsOrderItem>;
+  /** The name of the restaurant that handled the order. */
+  restaurant: Scalars['String']['output'];
+  /** Enum indicating the status of the order */
+  status: UberEatsOrderStatus;
+  /** List of identifiers associated with the activity's subject. */
+  subject?: Maybe<Array<Maybe<Identifier>>>;
+  /** The total amount spent on this order. */
+  totalPrice: Scalars['Float']['output'];
+};
+
+export type UberEatsOrderItem = {
+  __typename?: 'UberEatsOrderItem';
+  /** Order customizations. */
+  customizations: Array<Maybe<UberEatsOrderItemCustomizations>>;
+  /** The name of the ordered item. */
+  name: Scalars['String']['output'];
+  /** The price per unit. */
+  price: Scalars['String']['output'];
+  /** The quantity purchased. */
+  quantityPurchased: Scalars['Int64']['output'];
+};
+
+export type UberEatsOrderItemCustomizations = {
+  __typename?: 'UberEatsOrderItemCustomizations';
+  /** The customization tag. */
+  customization: Scalars['String']['output'];
+  /** The customization quantity requested. */
+  quantity: Scalars['Int64']['output'];
+  /** The customization chosen. */
+  value: Scalars['String']['output'];
+};
+
+export enum UberEatsOrderStatus {
+  EaterCancelled = 'EATER_CANCELLED',
+  RestaurantCancelled = 'RESTAURANT_CANCELLED',
+  RestaurantUnfulfilled = 'RESTAURANT_UNFULFILLED',
+  Success = 'SUCCESS',
+  Unknown = 'UNKNOWN'
 }
 
 export type YoutubeActivityMetadata = ActivityMetadata & {
@@ -312,8 +546,8 @@ export type GetAppByPublicKeyQuery = { __typename?: 'Query', getAppByPublicKey: 
 export type GetSupportedServicesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetSupportedServicesQuery = { __typename?: 'Query', __type?: { __typename?: '__Type', name?: string | null, enumValues?: Array<{ __typename?: '__EnumValue', name: string }> | null } | null };
+export type GetSupportedServicesQuery = { __typename?: 'Query', __sourceType?: { __typename?: '__Type', name?: string | null, enumValues?: Array<{ __typename?: '__EnumValue', name: string }> | null } | null, __traitType?: { __typename?: '__Type', name?: string | null, enumValues?: Array<{ __typename?: '__EnumValue', name: string }> | null } | null, __activityType?: { __typename?: '__Type', name?: string | null, enumValues?: Array<{ __typename?: '__EnumValue', name: string }> | null } | null };
 
 
 export const GetAppByPublicKeyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAppByPublicKey"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAppByPublicKey"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"publicKey"},"value":{"kind":"Variable","name":{"kind":"Name","value":"publicKey"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"appName"}},{"kind":"Field","name":{"kind":"Name","value":"gandalfID"}}]}}]}}]} as unknown as DocumentNode<GetAppByPublicKeyQuery, GetAppByPublicKeyQueryVariables>;
-export const GetSupportedServicesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetSupportedServices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__type"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"Source","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"enumValues"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeDeprecated"},"value":{"kind":"BooleanValue","value":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetSupportedServicesQuery, GetSupportedServicesQueryVariables>;
+export const GetSupportedServicesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetSupportedServices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"__sourceType"},"name":{"kind":"Name","value":"__type"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"Source","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"enumValues"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeDeprecated"},"value":{"kind":"BooleanValue","value":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","alias":{"kind":"Name","value":"__traitType"},"name":{"kind":"Name","value":"__type"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"TraitLabel","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"enumValues"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeDeprecated"},"value":{"kind":"BooleanValue","value":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","alias":{"kind":"Name","value":"__activityType"},"name":{"kind":"Name","value":"__type"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"StringValue","value":"ActivityType","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"enumValues"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"includeDeprecated"},"value":{"kind":"BooleanValue","value":false}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetSupportedServicesQuery, GetSupportedServicesQueryVariables>;

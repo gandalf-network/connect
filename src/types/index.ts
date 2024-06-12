@@ -1,6 +1,10 @@
+import { ActivityType, Source, TraitLabel } from '../api/__generated__/graphql';
+
 export type InputData = {
   [key: string]: boolean | Service;
 };
+
+export { Source, TraitLabel, ActivityType };
 
 export type Service = {
   traits?: string[];

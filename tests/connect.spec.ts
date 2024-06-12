@@ -1,5 +1,5 @@
 import { verifyPublicKey } from "../src/api/publicKey";
-import { getSupportedServices } from "../src/api/supportedServices";
+import { getSupportedServicesAndTraits } from "../src/api/supportedServices";
 import Connect from "../src/index";
 import { ANDROID_APP_CLIP_BASE_URL, IOS_APP_CLIP_BASE_URL, UNIVERSAL_APP_CLIP_BASE_URL } from "../src/lib/constants";
 import { InputData, Platform } from "../src/types";
@@ -9,7 +9,7 @@ jest.mock("../src/api/publicKey", () => ({
 }));
 
 jest.mock("../src/api/supportedServices", () => ({
-  getSupportedServices: jest.fn(),
+  getSupportedServicesAndTraits: jest.fn(),
 }));
 
 jest.mock("qr-code-styling", () =>
@@ -31,12 +31,18 @@ describe("Connect SDK", () => {
 
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
-    (getSupportedServices as jest.Mock).mockResolvedValue(["netflix", "uber", "instacart"]);
+    (getSupportedServicesAndTraits as jest.Mock).mockResolvedValue(
+      {
+        services: ["netflix", "uber", "instacart", "gandalf"],
+        activities: ["trip", "watch", "shop"],
+        traits: ["email", "post_count", "follower_count", "rating", "plan"],
+      }
+    );
     global.URL.createObjectURL = jest.fn(() => "mocked-object-url");
   });
 
   afterEach(() => {
-    (getSupportedServices as jest.Mock).mockClear();
+    (getSupportedServicesAndTraits as jest.Mock).mockClear();
   });
 
   describe("Constructor", () => {
@@ -112,7 +118,48 @@ describe("Connect SDK", () => {
       });
 
       await expect(connect.generateURL()).rejects.toThrow(
-        `These services ${Object.keys(invalidDataServices).join(" ")} are unsupported`,
+        `These services [ ${Object.keys(invalidDataServices).join(", ")} ] are unsupported`,
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it("should throw error if invalid trait is passed", async () => {
+      const invalidTraits = ["age", "color"]
+      const invalidDataServices = {
+        netflix: {
+          traits: invalidTraits,
+          activities: ["watch"]
+        },
+      } as InputData;
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: invalidDataServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        `These traits [ ${invalidTraits.join(", ")} ] are unsupported`,
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it("should throw error if invalid activity is passed", async () => {
+      const invalidActivities = ["read", "dance"]
+      const invalidDataServices = {
+        netflix: {
+          activities: invalidActivities
+        },
+      } as InputData;
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: invalidDataServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        `These activities [ ${invalidActivities.join(", ")} ] are unsupported`,
       );
       expect(connect.verificationComplete).toEqual(false);
     });
@@ -230,8 +277,8 @@ describe("Connect SDK", () => {
 
   describe("getSupportedServices", () => {
     it("should get the supported services", async () => {
-      await Connect.getSupportedServices();
-      expect(getSupportedServices as jest.Mock).toHaveBeenCalledTimes(1);
+      await Connect.getSupportedServicesAndTraits();
+      expect(getSupportedServicesAndTraits as jest.Mock).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -241,7 +288,7 @@ describe("Connect SDK", () => {
       const connect = new Connect({publicKey, redirectURL, services: invalidServices});
 
       await expect(connect.generateURL()).rejects.toThrow(
-        `These services ${Object.keys(invalidServices).join(' ')} are unsupported`
+        `These services [ ${Object.keys(invalidServices).join(' ')} ] are unsupported`
       );
       expect(connect.verificationComplete).toEqual(false);
     });
