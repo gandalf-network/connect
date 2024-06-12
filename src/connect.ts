@@ -221,7 +221,9 @@ class Connect {
 
     if (input.activities) {
       for (const key of input.activities) {
-        if (!supportedServicesAndTraits.activities.includes(key)) {
+        if (
+          !supportedServicesAndTraits.activities.includes(key.toLowerCase())
+        ) {
           unsupportedActivities = [...unsupportedActivities, key];
           continue;
         }
@@ -230,7 +232,7 @@ class Connect {
 
     if (input.traits) {
       for (const key of input.traits) {
-        if (!supportedServicesAndTraits.traits.includes(key)) {
+        if (!supportedServicesAndTraits.traits.includes(key.toLowerCase())) {
           unsupportedTraits = [...unsupportedTraits, key];
           continue;
         }
