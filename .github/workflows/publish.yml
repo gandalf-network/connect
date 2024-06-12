@@ -59,7 +59,9 @@ jobs:
       - run: npm run build
         env:
           WATSON_URL: ${{ secrets.WATSON_URL }}
-          APP_CLIP_BASE_URL: ${{ secrets.APP_CLIP_BASE_URL }}
+          IOS_APP_CLIP_BASE_URL: ${{ secrets.IOS_APP_CLIP_BASE_URL }}
+          UNIVERSAL_APP_CLIP_BASE_URL: ${{ secrets.UNIVERSAL_APP_CLIP_BASE_URL }}
+          ANDROID_APP_CLIP_BASE_URL: ${{ secrets.ANDROID_APP_CLIP_BASE_URL }}
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
