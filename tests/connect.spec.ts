@@ -54,7 +54,7 @@ describe("Connect SDK", () => {
 
       expect(connect.publicKey).toEqual(publicKey);
       expect(connect.redirectURL).toEqual(redirectURL);
-      expect(connect.platform).toEqual(Platform.ios);
+      expect(connect.platform).toEqual(Platform.IOS);
     });
 
     it("should strip the redirect url of trailing slashes", async () => {
@@ -66,9 +66,9 @@ describe("Connect SDK", () => {
 
     it("should set the platform", async () => {
       const redirectURL = "https://example.com/";
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.UNIVERSAL });
 
-      expect(connect.platform).toEqual(Platform.universal);
+      expect(connect.platform).toEqual(Platform.UNIVERSAL);
     });
   });
 
@@ -229,7 +229,7 @@ describe("Connect SDK", () => {
     });
 
     it("should generate a universal connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.UNIVERSAL });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
         `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
@@ -237,7 +237,7 @@ describe("Connect SDK", () => {
     });
 
     it("should generate an android connect URL", async () => {
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.android });
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.ANDROID });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
         `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
@@ -305,13 +305,13 @@ describe("Connect SDK", () => {
     });
 
     it("should generate a universal connect URL", async () => {
-      const services = {"netflix": true};
-      const stringData = JSON.stringify(services);
+      const services = {"NETFLIX": true};
+      const stringData = JSON.stringify({"netflix": true});
       const encodedData = encodeURIComponent(btoa(stringData));
       const encodedRedirectURL = encodeURIComponent(redirectURL);
       const encodedPublicKey = encodeURIComponent(publicKey);
 
-      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.universal });
+      const connect = new Connect({ publicKey, redirectURL, services, platform: Platform.UNIVERSAL });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
         `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
