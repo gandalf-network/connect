@@ -28,10 +28,13 @@ npm install @gandalf-network/connect --save
 
 ```typescript
 import Connect from "@gandalf-network/connect";
+import { Platform } from "@gandalf-network/connect/components";
 
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
+    // The platform defaults to IOS but could be ANDROID or UNIVERSAL
+    platform: platform.android,
     services: 
     {
         uber: {
@@ -48,10 +51,13 @@ const connect = new Connect({
 ```javascript
 // CommonJS
 const Connect = require("@gandalf-network/connect");
+const { Platform } = require("@gandalf-network/connect/components");
 
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
+    // The platform defaults to IOS but could be ANDROID or UNIVERSAL
+    platform: platform.android,
     services: 
     {
         uber: {
