@@ -26,6 +26,9 @@ npm install @gandalf-network/connect --save
 
 #### Initialization
 
+Note: With the platform parameter you can generate either IOS, ANDROID or UNIVERSAL connect URLs.
+More Information on the Platform parameter can be found [here](https://docs.gandalf.network/concepts/connect).
+
 ```typescript
 import Connect from "@gandalf-network/connect";
 import { Platform } from "@gandalf-network/connect/components";
