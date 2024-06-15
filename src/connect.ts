@@ -32,7 +32,7 @@ class Connect {
   publicKey: string;
   redirectURL: string;
   data: InputData;
-  platform: Platform = Platform.ios;
+  platform: Platform = Platform.IOS;
   verificationComplete: boolean = false;
 
   constructor(input: ConnectInput) {
@@ -42,7 +42,7 @@ class Connect {
     this.publicKey = input.publicKey;
     this.redirectURL = input.redirectURL;
     this.data = input.services;
-    this.platform = input.platform ? input.platform : Platform.ios;
+    this.platform = input.platform ? input.platform : Platform.IOS;
   }
 
   async generateURL(): Promise<string> {
@@ -109,10 +109,10 @@ class Connect {
   ): string {
     let BASE_URL = IOS_APP_CLIP_BASE_URL;
     switch (this.platform) {
-      case Platform.android:
+      case Platform.ANDROID:
         BASE_URL = ANDROID_APP_CLIP_BASE_URL;
         break;
-      case Platform.universal:
+      case Platform.UNIVERSAL:
         BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
         break;
     }
@@ -163,9 +163,13 @@ class Connect {
 
     let unsupportedServices: string[] = [];
 
-    const keys = Object.keys(input).map((key) => key.toLowerCase());
+    const keys = Object.keys(input);
+    const lkeys = keys.map((key) => key.toLowerCase());
 
-    if (keys.length > 2 || (keys.length === 2 && !keys.includes('gandalf'))) {
+    if (
+      lkeys.length > 2 ||
+      (lkeys.length === 2 && !lkeys.includes('gandalf'))
+    ) {
       throw new GandalfError(
         `Only one non Gandalf service is supported per Connect URL`,
         GandalfErrorCode.InvalidService,
@@ -173,7 +177,11 @@ class Connect {
     }
 
     for (const key of keys) {
-      if (!supportedServicesAndTraits.services.includes(key as Source)) {
+      if (
+        !supportedServicesAndTraits.services.includes(
+          key.toLocaleLowerCase() as Source,
+        )
+      ) {
         unsupportedServices = [...unsupportedServices, key];
         continue;
       }

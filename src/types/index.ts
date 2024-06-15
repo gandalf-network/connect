@@ -12,9 +12,9 @@ export type Service = {
 };
 
 export enum Platform {
-  universal = 'UNIVERSAL',
-  ios = 'IOS',
-  android = 'ANDROID',
+  UNIVERSAL = 'UNIVERSAL',
+  IOS = 'IOS',
+  ANDROID = 'ANDROID',
 }
 
 export type ConnectInput = {

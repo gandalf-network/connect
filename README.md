@@ -24,20 +24,30 @@ npm install @gandalf-network/connect --save
 
 ### Usage
 
-#### Initialization
-
-Note: With the platform parameter you can generate either IOS, ANDROID or UNIVERSAL connect URLs.
-More Information on the Platform parameter can be found [here](https://docs.gandalf.network/concepts/connect).
+#### Import the library
 
 ```typescript
+// Typescript && ESModules
+
 import Connect from "@gandalf-network/connect";
 import { Platform } from "@gandalf-network/connect/components";
+```
 
+```javascript
+// CommonJS
+
+const Connect = require("@gandalf-network/connect");
+const { Platform } = require("@gandalf-network/connect/components");
+```
+
+#### Initialize Connect
+
+```typescript
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
     // The platform defaults to IOS but could be ANDROID or UNIVERSAL
-    platform: platform.android,
+    platform: Platform.ANDROID,
     services: 
     {
         uber: {
@@ -48,29 +58,6 @@ const connect = new Connect({
             traits: ["email"]
         }
     } // Only one non "Gandalf" service (e.g "netflix", "instacart") is supported per Connect URL
-})
-```
-
-```javascript
-// CommonJS
-const Connect = require("@gandalf-network/connect");
-const { Platform } = require("@gandalf-network/connect/components");
-
-const connect = new Connect({
-    publicKey: process.env.PUBLIC_KEY, 
-    redirectURL: "YOUR_REDIRECT_URL",
-    // The platform defaults to IOS but could be ANDROID or UNIVERSAL
-    platform: platform.android,
-    services: 
-    {
-        uber: {
-            traits: ["rating"], // At least one trait or activity is required
-            activities: ["trip"],
-        },
-        gandalf: {
-            traits: ["email"]
-        }
-    } // Only one non "Gandalf" service (e.g "uber", "amazon") is supported per Connect URL
 })
 ```
 
