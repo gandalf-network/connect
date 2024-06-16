@@ -12,9 +12,9 @@ export type Service = {
 };
 
 export enum Platform {
-  universal = 'UNIVERSAL',
-  ios = 'IOS',
-  android = 'ANDROID',
+  UNIVERSAL = 'UNIVERSAL',
+  IOS = 'IOS',
+  ANDROID = 'ANDROID',
 }
 
 export type ConnectInput = {
@@ -22,6 +22,7 @@ export type ConnectInput = {
   redirectURL: string;
   services: InputData;
   platform?: Platform;
+  useAlphaVersionParams?: boolean;
 };
 
 export enum GandalfErrorCode {

@@ -24,44 +24,37 @@ npm install @gandalf-network/connect --save
 
 ### Usage
 
-#### Initialization
+#### Import the library
 
 ```typescript
-import Connect from "@gandalf-network/connect";
+// Typescript && ESModules
 
-const connect = new Connect({
-    publicKey: process.env.PUBLIC_KEY, 
-    redirectURL: "YOUR_REDIRECT_URL",
-    services: 
-    {
-        uber: {
-            traits: ["rating"], // At least one trait or activity is required
-            activities: ["trip"],
-        },
-        gandalf: {
-            traits: ["email"]
-        }
-    } // Only one non "Gandalf" service (e.g "netflix", "instacart") is supported per Connect URL
-})
+import Connect from "@gandalf-network/connect";
+import { Platform } from "@gandalf-network/connect/components";
 ```
 
 ```javascript
 // CommonJS
-const Connect = require("@gandalf-network/connect");
 
+const Connect = require("@gandalf-network/connect");
+const { Platform } = require("@gandalf-network/connect/components");
+```
+
+#### Initialize Connect
+
+```typescript
 const connect = new Connect({
     publicKey: process.env.PUBLIC_KEY, 
     redirectURL: "YOUR_REDIRECT_URL",
+    // The platform defaults to IOS but could be ANDROID or UNIVERSAL
+    platform: Platform.ANDROID,
     services: 
     {
         uber: {
             traits: ["rating"], // At least one trait or activity is required
             activities: ["trip"],
         },
-        gandalf: {
-            traits: ["email"]
-        }
-    } // Only one non "Gandalf" service (e.g "uber", "amazon") is supported per Connect URL
+    }
 })
 ```
 
@@ -86,6 +79,10 @@ console.log(qrCodeURL)
 ```typescript
 const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
 console.log(datakey)
+```
+
+```bash
+npm install @gandalf-network/connect --save
 ```
 
 ## Contributing
