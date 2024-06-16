@@ -54,10 +54,7 @@ const connect = new Connect({
             traits: ["rating"], // At least one trait or activity is required
             activities: ["trip"],
         },
-        gandalf: {
-            traits: ["email"]
-        }
-    } // Only one non "Gandalf" service (e.g "netflix", "instacart") is supported per Connect URL
+    }
 })
 ```
 
