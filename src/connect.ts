@@ -36,7 +36,7 @@ class Connect {
   verificationComplete: boolean = false;
   useAlphaVersionParams: boolean = false;
 
-  constructor(input: ConnectInput, useAlphaVersionParams: boolean = false) {
+  constructor(input: ConnectInput) {
     if (input.redirectURL.endsWith('/')) {
       input.redirectURL = input.redirectURL.slice(0, -1);
     }
@@ -44,7 +44,7 @@ class Connect {
     this.redirectURL = input.redirectURL;
     this.data = input.services;
     this.platform = input.platform ? input.platform : Platform.IOS;
-    this.useAlphaVersionParams = useAlphaVersionParams;
+    this.useAlphaVersionParams = !!input.useAlphaVersionParams;
   }
 
   async generateURL(): Promise<string> {
@@ -241,9 +241,7 @@ class Connect {
             'At least one service has to be required',
             GandalfErrorCode.InvalidService,
           );
-        if (useAlphaVersionParams) {
-          cleanServices[key.toLowerCase()] = true;
-        } else cleanServices[key.toLowerCase()] = input[key as Source];
+        cleanServices[key.toLowerCase()] = true;
       } else {
         this.validateInputService(service, supportedServicesAndTraits);
         cleanServices[key.toLowerCase()] = input[key as Source];
