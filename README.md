@@ -81,10 +81,6 @@ const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
 console.log(datakey)
 ```
 
-```bash
-npm install @gandalf-network/connect --save
-```
-
 ## Contributing
 
 Contributions are welcome, whether they're feature requests, bug fixes, or documentation improvements.
