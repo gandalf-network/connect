@@ -81,22 +81,6 @@ const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
 console.log(datakey)
 ```
 
-### Additional
-
-You can generate legacy Connect URLs by setting `useAlphaVersionParams` to true
-
-```typescript
-const connect = new Connect({
-    publicKey: process.env.PUBLIC_KEY, 
-    redirectURL: "YOUR_REDIRECT_URL",
-    platform: Platform.ANDROID,
-    services: { uber: true },
-
-    // Set useAlphaVersionParams to true
-    useAlphaVersionParams: true,
-})
-```
-
 ```bash
 npm install @gandalf-network/connect --save
 ```
