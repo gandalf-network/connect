@@ -34,8 +34,9 @@ class Connect {
   data: InputData;
   platform: Platform = Platform.IOS;
   verificationComplete: boolean = false;
+  useAlphaVersionParams: boolean = false;
 
-  constructor(input: ConnectInput) {
+  constructor(input: ConnectInput, useAlphaVersionParams: boolean = false) {
     if (input.redirectURL.endsWith('/')) {
       input.redirectURL = input.redirectURL.slice(0, -1);
     }
@@ -43,16 +44,28 @@ class Connect {
     this.redirectURL = input.redirectURL;
     this.data = input.services;
     this.platform = input.platform ? input.platform : Platform.IOS;
+    this.useAlphaVersionParams = useAlphaVersionParams;
   }
 
   async generateURL(): Promise<string> {
     await this.allValidations(this.publicKey, this.redirectURL, this.data);
     const data = JSON.stringify(this.data);
-    const appClipURL = this.encodeComponents(
-      data,
-      this.redirectURL,
-      this.publicKey,
-    );
+    let appClipURL = '';
+
+    if (this.useAlphaVersionParams) {
+      appClipURL = this.encodeLegacyComponents(
+        data,
+        this.redirectURL,
+        this.publicKey,
+      );
+    } else {
+      appClipURL = this.encodeComponents(
+        data,
+        this.redirectURL,
+        this.publicKey,
+      );
+    }
+
     return appClipURL;
   }
 
@@ -132,6 +145,35 @@ class Connect {
     return url.toString();
   }
 
+  private encodeLegacyComponents(
+    services: string,
+    redirectUrl: string,
+    publicKey: string,
+  ): string {
+    let BASE_URL = IOS_APP_CLIP_BASE_URL;
+    switch (this.platform) {
+      case Platform.ANDROID:
+        BASE_URL = ANDROID_APP_CLIP_BASE_URL;
+        break;
+      case Platform.UNIVERSAL:
+        BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
+        break;
+    }
+
+    const url = new URL(BASE_URL);
+    const params: Record<string, string> = {
+      publicKey,
+      redirectUrl,
+      services,
+    };
+
+    Object.keys(params).forEach((key) =>
+      url.searchParams.append(key, params[key]),
+    );
+
+    return url.toString();
+  }
+
   private async allValidations(
     publicKey: string,
     redirectURL: string,
@@ -140,7 +182,10 @@ class Connect {
     if (!this.verificationComplete) {
       await Connect.validatePublicKey(publicKey);
       Connect.validateRedirectURL(redirectURL);
-      const cleanServices = await Connect.validateInputData(data);
+      const cleanServices = await Connect.validateInputData(
+        data,
+        this.useAlphaVersionParams,
+      );
       this.data = cleanServices;
     }
 
@@ -157,7 +202,10 @@ class Connect {
     }
   }
 
-  private static async validateInputData(input: InputData): Promise<InputData> {
+  private static async validateInputData(
+    input: InputData,
+    useAlphaVersionParams: boolean = false,
+  ): Promise<InputData> {
     const supportedServicesAndTraits = await getSupportedServicesAndTraits();
     const cleanServices: InputData = {};
 
@@ -187,13 +235,15 @@ class Connect {
       }
 
       const service = input[key];
-      if (typeof service === 'boolean') {
+      if (typeof service === 'boolean' || useAlphaVersionParams) {
         if (!service)
           throw new GandalfError(
             'At least one service has to be required',
             GandalfErrorCode.InvalidService,
           );
-        cleanServices[key.toLowerCase()] = input[key as Source];
+        if (useAlphaVersionParams) {
+          cleanServices[key.toLowerCase()] = true;
+        } else cleanServices[key.toLowerCase()] = input[key as Source];
       } else {
         this.validateInputService(service, supportedServicesAndTraits);
         cleanServices[key.toLowerCase()] = input[key as Source];
