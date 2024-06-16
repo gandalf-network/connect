@@ -22,6 +22,7 @@ export type ConnectInput = {
   redirectURL: string;
   services: InputData;
   platform?: Platform;
+  useAlphaVersionParams?: boolean;
 };
 
 export enum GandalfErrorCode {
