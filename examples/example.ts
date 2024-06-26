@@ -10,6 +10,10 @@ const services: InputData = {
         traits: [TraitLabel.Plan],
         activities: [ActivityType.Trip],
     },
+    netflix: {
+      activities: [ActivityType.Watch],
+      required: false,
+    },
     gandalf: {
         traits: ["email"]
     }
