@@ -54,6 +54,10 @@ const connect = new Connect({
             traits: ["rating"], // At least one trait or activity is required
             activities: ["trip"],
         },
+        netflix: {
+            activities: ["watch"],
+            required: false // To make a service optional to the user
+        },
     }
 })
 ```
@@ -79,10 +83,6 @@ console.log(qrCodeURL)
 ```typescript
 const datakey = Connect.getDataKeyFromURL("REDIRECT_URL")
 console.log(datakey)
-```
-
-```bash
-npm install @gandalf-network/connect --save
 ```
 
 ## Contributing

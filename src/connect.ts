@@ -48,6 +48,22 @@ class Connect {
   }
 
   async generateURL(): Promise<string> {
+    // Check and add the required property for each service
+    const updatedData: InputData = {};
+    for (const service in this.data) {
+      const serviceData = this.data[service];
+      if (typeof serviceData === 'boolean') {
+        updatedData[service] = serviceData;
+      } else {
+        updatedData[service] = {
+          ...serviceData,
+          required:
+            serviceData.required === undefined ? true : serviceData.required,
+        };
+      }
+    }
+
+    this.data = updatedData;
     await this.allValidations(this.publicKey, this.redirectURL, this.data);
     const data = JSON.stringify(this.data);
     let appClipURL = '';
@@ -210,19 +226,9 @@ class Connect {
     const cleanServices: InputData = {};
 
     let unsupportedServices: string[] = [];
+    let atLeastOneServiceRequired = false;
 
     const keys = Object.keys(input);
-    const lkeys = keys.map((key) => key.toLowerCase());
-
-    if (
-      lkeys.length > 2 ||
-      (lkeys.length === 2 && !lkeys.includes('gandalf'))
-    ) {
-      throw new GandalfError(
-        `Only one non Gandalf service is supported per Connect URL`,
-        GandalfErrorCode.InvalidService,
-      );
-    }
 
     for (const key of keys) {
       if (
@@ -238,19 +244,30 @@ class Connect {
       if (typeof service === 'boolean' || useAlphaVersionParams) {
         if (!service)
           throw new GandalfError(
-            'At least one service has to be required',
+            'At least one service must be required',
             GandalfErrorCode.InvalidService,
           );
         cleanServices[key.toLowerCase()] = true;
+        atLeastOneServiceRequired = true;
       } else {
         this.validateInputService(service, supportedServicesAndTraits);
         cleanServices[key.toLowerCase()] = input[key as Source];
+        if (service.required) {
+          atLeastOneServiceRequired = true;
+        }
       }
     }
 
     if (unsupportedServices.length > 0) {
       throw new GandalfError(
         `These services [ ${unsupportedServices.join(', ')} ] are unsupported`,
+        GandalfErrorCode.InvalidService,
+      );
+    }
+
+    if (!atLeastOneServiceRequired) {
+      throw new GandalfError(
+        'At least one service must be required',
         GandalfErrorCode.InvalidService,
       );
     }
