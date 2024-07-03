@@ -18,6 +18,7 @@ import {
   GandalfErrorCode,
   InputData,
   Service,
+  ConnectOptions,
 } from './types';
 
 let QRCodeStyling: any;
@@ -34,6 +35,7 @@ class Connect {
   data: InputData;
   platform: Platform = Platform.IOS;
   verificationComplete: boolean = false;
+  options: ConnectOptions | undefined = undefined;
   useAlphaVersionParams: boolean = false;
 
   constructor(input: ConnectInput) {
@@ -44,6 +46,7 @@ class Connect {
     this.redirectURL = input.redirectURL;
     this.data = input.services;
     this.platform = input.platform ? input.platform : Platform.IOS;
+    this.options = input.options;
     this.useAlphaVersionParams = !!input.useAlphaVersionParams;
   }
 
@@ -65,24 +68,30 @@ class Connect {
 
     this.data = updatedData;
     await this.allValidations(this.publicKey, this.redirectURL, this.data);
-    const data = JSON.stringify(this.data);
-    let appClipURL = '';
+    let data: any = {
+      ...this.data,
+    };
 
-    if (this.useAlphaVersionParams) {
-      appClipURL = this.encodeLegacyComponents(
-        data,
-        this.redirectURL,
-        this.publicKey,
-      );
-    } else {
-      appClipURL = this.encodeComponents(
-        data,
-        this.redirectURL,
-        this.publicKey,
-      );
+    if (this.options) {
+      const { style: options } = this.options;
+      data = {
+        ...data,
+        options,
+      };
     }
 
-    return appClipURL;
+    console.log(data);
+
+    const JSONData = JSON.stringify(data);
+
+    if (this.useAlphaVersionParams)
+      return this.encodeLegacyComponents(
+        JSONData,
+        this.redirectURL,
+        this.publicKey,
+      );
+
+    return this.encodeComponents(JSONData, this.redirectURL, this.publicKey);
   }
 
   async generateQRCode(): Promise<string> {
