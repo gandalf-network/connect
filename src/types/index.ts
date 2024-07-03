@@ -18,11 +18,23 @@ export enum Platform {
   ANDROID = 'ANDROID',
 }
 
+export type StylingOptions = {
+  primaryColor?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  accentColor?: string;
+};
+
+export type ConnectOptions = {
+  style: StylingOptions;
+};
+
 export type ConnectInput = {
   publicKey: string;
   redirectURL: string;
   services: InputData;
   platform?: Platform;
+  options?: ConnectOptions;
   useAlphaVersionParams?: boolean;
 };
 

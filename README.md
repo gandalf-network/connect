@@ -58,6 +58,15 @@ const connect = new Connect({
             activities: ["watch"],
             required: false // To make a service optional to the user
         },
+    },
+    // Optional paramter to modify the Connect UI
+    options: {
+        style: {
+            primaryColor: "#7949D1", 
+            backgroundColor: "#fff", 
+            foregroundColor: "#562BA6", 
+            accentColor: "#F4F0FB"
+        }
     }
 })
 ```
