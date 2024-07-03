@@ -100,29 +100,16 @@ export type BookingActivityMetadata = ActivityMetadata & {
   /** Reference identifying a booking */
   bookingID: Scalars['String']['output'];
   /** An array of bookings in a single purchase */
-  bookings: Array<BookingItem>;
+  bookings: Array<Maybe<BookingItemInterface>>;
   /** The ticket or bill of a trip or stay */
   price: Scalars['String']['output'];
   /** List of identifiers associated with the activity's subject. */
   subject?: Maybe<Array<Maybe<Identifier>>>;
 };
 
-export type BookingItem = {
-  __typename?: 'BookingItem';
+export type BookingItemInterface = {
   /** Activity type of the returned data source */
   activityType: ActivityType;
-  /** The location of a trip */
-  address: Scalars['String']['output'];
-  /** The location of arrival of a booking flight */
-  arrivalLocation: Scalars['String']['output'];
-  /** The location where a booking flight takes off from */
-  depatureLocation: Scalars['String']['output'];
-  /** CheckOut time of a booking */
-  endDateTime: Scalars['Time']['output'];
-  /** An string listing the stops of a flight between its depature and arrival locations */
-  layoverLocations: Array<Maybe<Scalars['String']['output']>>;
-  /** CheckIn time of a booking */
-  startDateTime: Scalars['Time']['output'];
 };
 
 export enum ContentType {
@@ -162,7 +149,7 @@ export type InstacartActivityMetadata = ActivityMetadata & {
   /** The date the order was placed */
   dateOrdered: Scalars['Date']['output'];
   /** List of items ordered. */
-  items: Array<InstacartOrderItem>;
+  items: Array<Maybe<InstacartOrderItem>>;
   /** The name of the ratailer that handled the order. */
   retailer: Scalars['String']['output'];
   /** String indicating the status of the order */
@@ -292,6 +279,8 @@ export type QueryLookupTraitArgs = {
 export enum Source {
   Amazon = 'AMAZON',
   Booking = 'BOOKING',
+  Farcaster = 'FARCASTER',
+  Gandalf = 'GANDALF',
   Instacart = 'INSTACART',
   Instagram = 'INSTAGRAM',
   Netflix = 'NETFLIX',
@@ -302,10 +291,22 @@ export enum Source {
   Youtube = 'YOUTUBE'
 }
 
+export type StayBooking = BookingItemInterface & {
+  __typename?: 'StayBooking';
+  /** Activity type of the returned data source */
+  activityType: ActivityType;
+  /** The location of a trip */
+  address: Scalars['String']['output'];
+  /** CheckOut time of a booking */
+  endDateTime: Scalars['Time']['output'];
+  /** CheckIn time of a booking */
+  startDateTime: Scalars['Time']['output'];
+};
+
 /** Represents a User Trait. */
 export type Trait = {
   __typename?: 'Trait';
-  /** Unique identifier for the activity. */
+  /** Unique identifier for the trait. */
   id: Scalars['UUID']['output'];
   /** The label of the trait. */
   label: TraitLabel;
@@ -321,6 +322,12 @@ export type Trait = {
 export enum TraitLabel {
   /** Date when the user account was created. */
   AccountCreatedOn = 'ACCOUNT_CREATED_ON',
+  /** The user's account ID on the platform. */
+  AccountId = 'ACCOUNT_ID',
+  /** The users email. */
+  Email = 'EMAIL',
+  /** The user's farcaster address. */
+  FarcasterAddress = 'FARCASTER_ADDRESS',
   /** The number of account following the user. */
   FollowerCount = 'FOLLOWER_COUNT',
   /** The number of accounts followed by the user. */
@@ -342,6 +349,18 @@ export enum TraitLabel {
   /** The users profile name. */
   Username = 'USERNAME'
 }
+
+export type TripBooking = BookingItemInterface & {
+  __typename?: 'TripBooking';
+  /** Activity type of the returned data source */
+  activityType: ActivityType;
+  /** The location of arrival of a booking flight */
+  arrivalLocation: Scalars['String']['output'];
+  /** The location where a booking flight takes off from */
+  departureLocation: Scalars['String']['output'];
+  /** A string listing the stops of a flight between its departure and arrival locations */
+  layoverLocations: Array<Maybe<Scalars['String']['output']>>;
+};
 
 export enum TripStatus {
   Canceled = 'CANCELED',
@@ -374,7 +393,7 @@ export type UberEatsActivityMetadata = ActivityMetadata & {
   /** Date indicating when the order was made. */
   date?: Maybe<Scalars['Date']['output']>;
   /** List of items ordered. */
-  items: Array<UberEatsOrderItem>;
+  items: Array<Maybe<UberEatsOrderItem>>;
   /** The name of the restaurant that handled the order. */
   restaurant: Scalars['String']['output'];
   /** Enum indicating the status of the order */

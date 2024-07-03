@@ -9,6 +9,7 @@ export { Source, TraitLabel, ActivityType };
 export type Service = {
   traits?: string[];
   activities?: string[];
+  required?: boolean;
 };
 
 export enum Platform {

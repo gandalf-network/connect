@@ -54,6 +54,10 @@ const connect = new Connect({
             traits: ["rating"], // At least one trait or activity is required
             activities: ["trip"],
         },
+        netflix: {
+            activities: ["watch"],
+            required: false // To make a service optional to the user
+        },
     }
 })
 ```
