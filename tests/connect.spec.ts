@@ -257,6 +257,42 @@ describe("Connect SDK", () => {
         `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
       );
     });
+
+    it('should generate an IOS connect URL with styling options set', async () => {
+      const style = {
+        primaryColor: "#7949D1", 
+        backgroundColor: "#fff", 
+        foregroundColor: "#562BA6", 
+        accentColor: "#F4F0FB"
+      }
+
+      const stringData = JSON.stringify(
+        {
+          ...services,
+          options: style,
+        }
+      )
+
+      const encodedData = encodeURIComponent(btoa(stringData));
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services,
+        options: {
+          style: {
+            primaryColor: "#7949D1", 
+            backgroundColor: "#fff", 
+            foregroundColor: "#562BA6", 
+            accentColor: "#F4F0FB"
+          }
+        }
+      });
+      const generatedURL = await connect.generateURL();
+      expect(generatedURL).toEqual(
+        `${IOS_APP_CLIP_BASE_URL}&publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
+      );
+    });
   });
 
   describe('generateQRCode', () => {
