@@ -80,8 +80,6 @@ class Connect {
       };
     }
 
-    console.log(data);
-
     const JSONData = JSON.stringify(data);
 
     if (this.useAlphaVersionParams)

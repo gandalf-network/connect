@@ -1,6 +1,6 @@
 {
   "name": "@gandalf-network/connect",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -16,7 +16,7 @@
     "./components": {
       "import": "./dist/components.mjs",
       "require": "./dist/components.js",
-      "types": "./dist/components.d.ts"
+      "types": "./dist/types/index.d.ts"
     }
   },
   "files": [
