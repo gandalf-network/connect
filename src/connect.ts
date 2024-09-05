@@ -165,6 +165,10 @@ class Connect {
       url.searchParams.append(key, params[key]),
     );
 
+    if (this.platform !== Platform.IOS) {
+      url.searchParams.append('isUniversal', 'true');
+    }
+
     return url.toString();
   }
 
