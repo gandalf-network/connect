@@ -143,11 +143,10 @@ class Connect {
     redirectUrl: string,
     publicKey: string,
   ): string {
-    let BASE_URL =
-      'https://appclip.apple.com/id?p=network.gandalf.connect.Clip';
+    let BASE_URL = IOS_APP_CLIP_BASE_URL;
     switch (this.platform) {
       case Platform.ANDROID:
-        BASE_URL = 'https://auth.gandalf.network';
+        BASE_URL = ANDROID_APP_CLIP_BASE_URL;
         break;
       case Platform.UNIVERSAL:
         BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
