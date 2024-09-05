@@ -241,7 +241,7 @@ describe("Connect SDK", () => {
       });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
+        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}&isUniversal=true`,
       );
     });
 
@@ -254,7 +254,7 @@ describe("Connect SDK", () => {
       });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
+        `${ANDROID_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}&isUniversal=true`,
       );
     });
 
@@ -381,7 +381,7 @@ describe("Connect SDK", () => {
       });
       const generatedURL = await connect.generateURL();
       expect(generatedURL).toEqual(
-        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}`,
+        `${UNIVERSAL_APP_CLIP_BASE_URL}/?publicKey=${encodedPublicKey}&redirectUrl=${encodedRedirectURL}&data=${encodedData}&isUniversal=true`,
       );
     });
   });
