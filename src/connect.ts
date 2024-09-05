@@ -143,10 +143,11 @@ class Connect {
     redirectUrl: string,
     publicKey: string,
   ): string {
-    let BASE_URL = IOS_APP_CLIP_BASE_URL;
+    let BASE_URL =
+      'https://appclip.apple.com/id?p=network.gandalf.connect.Clip';
     switch (this.platform) {
       case Platform.ANDROID:
-        BASE_URL = ANDROID_APP_CLIP_BASE_URL;
+        BASE_URL = 'https://auth.gandalf.network';
         break;
       case Platform.UNIVERSAL:
         BASE_URL = UNIVERSAL_APP_CLIP_BASE_URL;
@@ -164,6 +165,10 @@ class Connect {
     Object.keys(params).forEach((key) =>
       url.searchParams.append(key, params[key]),
     );
+
+    if (this.platform !== Platform.IOS) {
+      url.searchParams.append('isUniversal', 'true');
+    }
 
     return url.toString();
   }
