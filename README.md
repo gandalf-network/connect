@@ -29,15 +29,13 @@ npm install @gandalf-network/connect --save
 ```typescript
 // Typescript && ESModules
 
-import Connect from "@gandalf-network/connect";
-import { Platform } from "@gandalf-network/connect/components";
+import Connect, { Platform } from "@gandalf-network/connect";
 ```
 
 ```javascript
 // CommonJS
 
-const Connect = require("@gandalf-network/connect");
-const { Platform } = require("@gandalf-network/connect/components");
+const Connect, { Platform } = require("@gandalf-network/connect");
 ```
 
 #### Initialize Connect
