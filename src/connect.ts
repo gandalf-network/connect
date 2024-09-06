@@ -1,3 +1,4 @@
+import { Base64 } from 'js-base64';
 import { verifyPublicKey } from './api/publicKey';
 import {
   ANDROID_APP_CLIP_BASE_URL,
@@ -13,21 +14,22 @@ import {
 } from './api/supportedServices';
 import GandalfError from './lib/errors';
 import {
+  InputData,
   Platform,
+  ConnectOptions,
   ConnectInput,
   GandalfErrorCode,
-  InputData,
   Service,
-  ConnectOptions,
 } from './types';
-
 let QRCodeStyling: any;
 
-if (typeof window !== 'undefined') {
-  import('qr-code-styling').then((module) => {
+const loadQRCodeStyling = async () => {
+  if (typeof window !== 'undefined' && !QRCodeStyling) {
+    const module = await import('qr-code-styling');
     QRCodeStyling = module.default;
-  });
-}
+  }
+  return QRCodeStyling;
+};
 
 class Connect {
   publicKey: string;
@@ -93,7 +95,17 @@ class Connect {
   }
 
   async generateQRCode(): Promise<string> {
-    if (typeof window === 'undefined') {
+    let QRCodeStyling: any;
+    try {
+      QRCodeStyling = await loadQRCodeStyling();
+
+      if (typeof window === 'undefined') {
+        throw new GandalfError(
+          'QrCode generation only works in browsers',
+          GandalfErrorCode.QRCodeGenNotSupported,
+        );
+      }
+    } catch (error) {
       throw new GandalfError(
         'QrCode generation only works in browsers',
         GandalfErrorCode.QRCodeGenNotSupported,
@@ -153,7 +165,7 @@ class Connect {
         break;
     }
 
-    const base64Data = btoa(data);
+    const base64Data = Base64.encode(data);
     const url = new URL(BASE_URL);
     const params: Record<string, string> = {
       publicKey,
