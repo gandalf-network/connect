@@ -1,6 +1,6 @@
 {
   "name": "@gandalf-network/connect",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -18,6 +18,11 @@
       "require": "./dist/components.js",
       "types": "./dist/types/index.d.ts"
     }
+  },
+  "typesVersions": {
+    "*": {
+      "components": ["./dist/types/index.d.ts"]
+   }
   },
   "files": [
     "dist/**/*"
@@ -39,10 +44,11 @@
     "url": "git+https://github.com/gandalf-network/connect.git"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
-    "qr-code-styling": "^1.6.0-rc.1",
-    "dotenv": "^16.4.5"
+    "js-base64": "^3.7.7",
+    "qr-code-styling": "^1.6.0-rc.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.3",
