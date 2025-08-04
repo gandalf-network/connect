@@ -24,7 +24,7 @@ const services: InputData = {
     traits: ['email'],
   },
   slack: {
-    workspaceURL: 'https://slack.com',
+    workspaceURL: 'https://your-workspace.slack.com',
     activities: [ActivityType.Message],
   },
 };

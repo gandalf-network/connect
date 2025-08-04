@@ -47,4 +47,5 @@ export enum GandalfErrorCode {
   QRCodeNotGenerated = 'QR_CODE_NOT_GENERATED',
   QRCodeGenNotSupported = 'QR_CODE_GEN_NOT_SUPPORTED',
   MissingWorkspaceURL = 'MISSING_WORKSPACE_URL',
+  InvalidWorkspaceURL = 'INVALID_WORKSPACE_URL',
 }

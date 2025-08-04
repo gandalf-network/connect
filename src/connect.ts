@@ -366,6 +366,7 @@ class Connect {
 
     let workspaceURL = service.workspaceURL.trim();
 
+    // Regex to validate that a string is a valid domain name (not a full URL, no protocol or path)
     const domainRegex =
       /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
@@ -390,7 +391,7 @@ class Connect {
     } catch (e) {
       throw new GandalfError(
         'Invalid workspaceURL for Slack service',
-        GandalfErrorCode.InvalidRedirectURL,
+        GandalfErrorCode.InvalidWorkspaceURL,
       );
     }
 
