@@ -56,6 +56,11 @@ const connect = new Connect({
             activities: ["watch"],
             required: false // To make a service optional to the user
         },
+        slack: {
+            activities: ["message"],
+            required: true,
+            workspaceURL: "https://your-workspace.slack.com" // Required for Slack service
+        },
     },
     // Optional paramter to modify the Connect UI
     options: {

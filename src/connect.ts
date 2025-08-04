@@ -14,11 +14,11 @@ import {
 } from './api/supportedServices';
 import GandalfError from './lib/errors';
 import {
+  ConnectInput,
+  ConnectOptions,
+  GandalfErrorCode,
   InputData,
   Platform,
-  ConnectOptions,
-  ConnectInput,
-  GandalfErrorCode,
   Service,
 } from './types';
 let QRCodeStyling: any;
@@ -274,6 +274,12 @@ class Connect {
         atLeastOneServiceRequired = true;
       } else {
         this.validateInputService(service, supportedServicesAndTraits);
+
+        // Check if this is a Slack service and validate workspaceURL
+        if (key.toLowerCase() === 'slack') {
+          this.validateSlackService(service);
+        }
+
         cleanServices[key.toLowerCase()] = input[key as Source];
         if (service.required) {
           atLeastOneServiceRequired = true;
@@ -348,6 +354,50 @@ class Connect {
         GandalfErrorCode.InvalidService,
       );
     }
+  }
+
+  private static validateSlackService(service: Service): void {
+    if (!service.workspaceURL || service.workspaceURL.trim() === '') {
+      throw new GandalfError(
+        'Slack service requires a workspaceURL',
+        GandalfErrorCode.MissingWorkspaceURL,
+      );
+    }
+
+    let workspaceURL = service.workspaceURL.trim();
+
+    // Regex to validate that a string is a valid domain name (not a full URL, no protocol or path)
+    const domainRegex =
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+    try {
+      if (
+        !workspaceURL.startsWith('http://') &&
+        !workspaceURL.startsWith('https://')
+      ) {
+        // For URLs without protocol, validate the domain format
+        if (!domainRegex.test(workspaceURL)) {
+          throw new Error('Invalid domain format');
+        }
+        new URL(`https://${workspaceURL}`);
+      } else {
+        new URL(workspaceURL);
+        // For URLs with protocol, also validate the hostname format
+        const url = new URL(workspaceURL);
+        if (!domainRegex.test(url.hostname)) {
+          throw new Error('Invalid domain format');
+        }
+      }
+    } catch (e) {
+      throw new GandalfError(
+        'Invalid workspaceURL for Slack service',
+        GandalfErrorCode.InvalidWorkspaceURL,
+      );
+    }
+
+    workspaceURL = workspaceURL.replace(/^https?:\/\//, '');
+
+    service.workspaceURL = workspaceURL;
   }
 
   private static validateRedirectURL(url: string): void {
