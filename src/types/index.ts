@@ -4,12 +4,13 @@ export type InputData = {
   [key: string]: boolean | Service;
 };
 
-export { Source, TraitLabel, ActivityType };
+export { ActivityType, Source, TraitLabel };
 
 export type Service = {
   traits?: string[];
   activities?: string[];
   required?: boolean;
+  workspaceURL?: string;
 };
 
 export enum Platform {
@@ -45,4 +46,5 @@ export enum GandalfErrorCode {
   DataKeyNotFound = 'DATA_KEY_NOT_FOUND',
   QRCodeNotGenerated = 'QR_CODE_NOT_GENERATED',
   QRCodeGenNotSupported = 'QR_CODE_GEN_NOT_SUPPORTED',
+  MissingWorkspaceURL = 'MISSING_WORKSPACE_URL',
 }

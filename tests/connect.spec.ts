@@ -37,8 +37,8 @@ describe("Connect SDK", () => {
   beforeEach(() => {
     (verifyPublicKey as jest.Mock).mockResolvedValue(true);
     (getSupportedServicesAndTraits as jest.Mock).mockResolvedValue({
-      services: ['netflix', 'uber', 'instacart', 'gandalf'],
-      activities: ['trip', 'watch', 'shop'],
+      services: ['netflix', 'uber', 'instacart', 'gandalf', 'slack'],
+      activities: ['trip', 'watch', 'shop', 'message'],
       traits: ['email', 'post_count', 'follower_count', 'rating', 'plan'],
     });
     global.URL.createObjectURL = jest.fn(() => 'mocked-object-url');
@@ -216,6 +216,161 @@ describe("Connect SDK", () => {
         'At least one service must be required',
       );
       expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it('should throw error if Slack service is missing workspaceURL', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        'Slack service requires a workspaceURL',
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it('should throw error if Slack service has empty workspaceURL', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+          workspaceURL: '',
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        'Slack service requires a workspaceURL',
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it('should throw error if Slack service has invalid workspaceURL', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+          workspaceURL: 'not-a-valid-url-at-all',
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      await expect(connect.generateURL()).rejects.toThrow(
+        'Invalid workspaceURL for Slack service',
+      );
+      expect(connect.verificationComplete).toEqual(false);
+    });
+
+    it('should pass validation if Slack service has valid workspaceURL', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+          workspaceURL: 'https://example-workspace.slack.com',
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      const url = await connect.generateURL();
+
+      // Extract and decode the data parameter to verify workspaceURL was stripped
+      const urlObj = new URL(url);
+      const dataParam = urlObj.searchParams.get('data');
+      const decodedData = JSON.parse(atob(decodeURIComponent(dataParam!)));
+
+      // Verify that the workspaceURL was stripped of https://
+      expect(decodedData.slack.workspaceURL).toBe(
+        'example-workspace.slack.com',
+      );
+      expect(decodedData.slack.workspaceURL).not.toBe(
+        'https://example-workspace.slack.com',
+      );
+      expect(connect.verificationComplete).toEqual(true);
+    });
+
+    it('should strip workspaceURL protocol and pass validation', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+          workspaceURL: 'http://another-workspace.slack.com',
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      const url = await connect.generateURL();
+
+      // Extract and decode the data parameter to verify workspaceURL was stripped
+      const urlObj = new URL(url);
+      const dataParam = urlObj.searchParams.get('data');
+      const decodedData = JSON.parse(atob(decodeURIComponent(dataParam!)));
+
+      // Verify that the workspaceURL was stripped of http://
+      expect(decodedData.slack.workspaceURL).toBe(
+        'another-workspace.slack.com',
+      );
+      expect(decodedData.slack.workspaceURL).not.toBe(
+        'http://another-workspace.slack.com',
+      );
+      expect(connect.verificationComplete).toEqual(true);
+    });
+
+    it('should accept workspaceURL without protocol', async () => {
+      const slackServices: InputData = {
+        slack: {
+          activities: ['message'],
+          required: true,
+          workspaceURL: 'workspace-without-protocol.slack.com',
+        },
+      };
+
+      const connect = new Connect({
+        publicKey,
+        redirectURL,
+        services: slackServices,
+      });
+
+      const url = await connect.generateURL();
+
+      // Extract and decode the data parameter to verify workspaceURL is included as-is
+      const urlObj = new URL(url);
+      const dataParam = urlObj.searchParams.get('data');
+      const decodedData = JSON.parse(atob(decodeURIComponent(dataParam!)));
+
+      // Verify that the workspaceURL is included as-is
+      expect(decodedData.slack.workspaceURL).toBe(
+        'workspace-without-protocol.slack.com',
+      );
+      expect(connect.verificationComplete).toEqual(true);
     });
   });
 

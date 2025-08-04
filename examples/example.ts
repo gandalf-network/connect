@@ -1,23 +1,33 @@
 import Connect from "../src/connect";
-import { ActivityType, InputData, TraitLabel, Platform, ConnectOptions } from "../src/types";
+import {
+  ActivityType,
+  ConnectOptions,
+  InputData,
+  Platform,
+  TraitLabel,
+} from '../src/types';
 
 const publicKey = "0x0297bb4f88a65b82c08fd20afb1259b7027dc996c8941e0c5917a452d538cd0da9";
 const redirectURL = "https://example.com"
 const platform = Platform.ANDROID;
 
 const services: InputData = {
-    uber: {
-        traits: [TraitLabel.Plan],
-        activities: [ActivityType.Trip],
-    },
-    netflix: {
-      activities: [ActivityType.Watch],
-      required: false,
-    },
-    gandalf: {
-        traits: ["email"]
-    }
-}
+  uber: {
+    traits: [TraitLabel.Plan],
+    activities: [ActivityType.Trip],
+  },
+  netflix: {
+    activities: [ActivityType.Watch],
+    required: false,
+  },
+  gandalf: {
+    traits: ['email'],
+  },
+  slack: {
+    workspaceURL: 'https://slack.com',
+    activities: [ActivityType.Message],
+  },
+};
 
 const options: ConnectOptions = {
     style: {
